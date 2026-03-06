@@ -4,6 +4,9 @@
 
 package com.mycompany.prac1_ipc2;
 
+import vista.LoginVista;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 /**
  *
  * @author jeffm
@@ -11,6 +14,14 @@ package com.mycompany.prac1_ipc2;
 public class Prac1_IPC2 {
 
     public static void main(String[] args) {
-        System.out.println("Hello World!");
+        // Intentar usar el look and feel del sistema operativo
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (Exception e) {
+            // Si falla, se usa el look and feel por defecto de Java
+        }
+
+        // Toda GUI de Swing debe iniciarse en el Event Dispatch Thread (EDT)
+        SwingUtilities.invokeLater(() -> new LoginVista());
     }
 }
