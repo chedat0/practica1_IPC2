@@ -56,7 +56,7 @@ public class GestionProductosVista extends JFrame{
         panelForm.setBackground(new Color(52, 73, 94));
         panelForm.setBorder(BorderFactory.createTitledBorder(
             BorderFactory.createLineBorder(Color.GRAY), "Datos del Producto",
-            0, 0, new Font("Arial", Font.BOLD, 12), Color.WHITE));
+            0, 0, new Font("Arial", Font.BOLD, 12), Color.black));
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(5, 8, 5, 8);
@@ -196,7 +196,7 @@ public class GestionProductosVista extends JFrame{
     private JButton crearBoton(String txt, Color bg, java.awt.event.ActionListener a) {
         JButton btn = new JButton(txt);
         btn.setBackground(bg);
-        btn.setForeground(Color.WHITE);
+        btn.setForeground(Color.black);
         btn.setFocusPainted(false);
         btn.addActionListener(a);
         return btn;

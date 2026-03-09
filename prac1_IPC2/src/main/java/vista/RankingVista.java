@@ -60,7 +60,7 @@ public class RankingVista extends JFrame{
         tabla.setGridColor(new Color(44, 62, 80));
         tabla.setRowHeight(26);
         tabla.getTableHeader().setBackground(new Color(41, 128, 185));
-        tabla.getTableHeader().setForeground(Color.WHITE);
+        tabla.getTableHeader().setForeground(Color.black);
         tabla.getTableHeader().setFont(new Font("Arial", Font.BOLD, 13));
         tabla.setFont(new Font("Arial", Font.PLAIN, 13));
         tabla.setSelectionBackground(new Color(41, 128, 185));

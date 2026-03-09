@@ -26,8 +26,7 @@ public class GestionUsuariosVista extends JFrame{
     private final SuperAdminControlador controller = new SuperAdminControlador();
     private JTable              tabla;
     private DefaultTableModel   modeloTabla;
-    private JTextField          txtUsername, txtNombre, txtApellido, txtEmail, txtPassword;
-    private JComboBox<Rol>      cmbRol;
+    private JTextField          txtUsername, txtNombre, txtApellido, txtEmail, txtPassword;   
     private JComboBox<Sucursal> cmbSucursal;
     private List<Usuario>       usuarios;
 
@@ -78,11 +77,7 @@ public class GestionUsuariosVista extends JFrame{
         agregarCampo(formPanel, gbc, "Nombre:",    txtNombre,   2);
         agregarCampo(formPanel, gbc, "Apellido:",  txtApellido, 3);
         agregarCampo(formPanel, gbc, "Email:",     txtEmail,    4);
-
-        gbc.gridx = 0; gbc.gridy = 5; gbc.gridwidth = 1;
-        JLabel lRol = new JLabel("Rol:"); lRol.setForeground(Color.WHITE);
-        formPanel.add(lRol, gbc);
-        gbc.gridx = 1; formPanel.add(cmbRol, gbc);
+        
 
         gbc.gridx = 0; gbc.gridy = 6;
         JLabel lSuc = new JLabel("Sucursal:"); lSuc.setForeground(Color.WHITE);
@@ -113,10 +108,7 @@ public class GestionUsuariosVista extends JFrame{
                     u.getSucursal() != null ? u.getSucursal().getNombre() : "Global",
                     u.isActivo() ? "Si" : "No"
                 });
-            }            
-            cmbRol.removeAllItems();
-            for (Rol r : controller.obtenerRoles()) cmbRol.addItem(r);
-
+            }                        
             cmbSucursal.removeAllItems();
             cmbSucursal.addItem(null);
             for (Sucursal s : controller.obtenerSucursales()) cmbSucursal.addItem(s);
@@ -173,14 +165,14 @@ public class GestionUsuariosVista extends JFrame{
         t.setBackground(new Color(52, 73, 94)); t.setForeground(Color.WHITE);
         t.setGridColor(new Color(44, 62, 80)); t.setRowHeight(24);
         t.getTableHeader().setBackground(new Color(41, 128, 185));
-        t.getTableHeader().setForeground(Color.WHITE);
+        t.getTableHeader().setForeground(Color.black);
         t.getTableHeader().setFont(new Font("Arial", Font.BOLD, 12));
         t.setSelectionBackground(new Color(41, 128, 185));
     }
 
     private JButton crearBoton(String txt, Color bg, java.awt.event.ActionListener a) {
         JButton b = new JButton(txt);
-        b.setBackground(bg); b.setForeground(Color.WHITE);
+        b.setBackground(bg); b.setForeground(Color.black);
         b.setFocusPainted(false); b.addActionListener(a); return b;
     }
 }

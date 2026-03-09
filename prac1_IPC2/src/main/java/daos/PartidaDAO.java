@@ -27,7 +27,7 @@ public class PartidaDAO {
     }
     
     public Partida obtenerPorId(int id) throws SQLException {
-        String sql = "SELECT * FROM partidas WHERE id_partida = ?";
+        String sql = "SELECT * FROM partida WHERE id_partida = ?";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
@@ -39,7 +39,7 @@ public class PartidaDAO {
   
     public List<Partida> obtenerTodas() throws SQLException {
         List<Partida> lista = new ArrayList<>();
-        String sql = "SELECT * FROM partidas ORDER BY fecha_inicio DESC";
+        String sql = "SELECT * FROM partida ORDER BY fecha_inicio DESC";
         try (PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) lista.add(mapear(rs));
@@ -49,7 +49,7 @@ public class PartidaDAO {
 
     public List<Partida> obtenerFinalizadasPorSucursal(int idSucursal) throws SQLException {
         List<Partida> lista = new ArrayList<>();
-        String sql = "SELECT * FROM partidas WHERE id_sucursal = ? AND estado = 'FINALIZADA' ORDER BY puntaje_total DESC";
+        String sql = "SELECT * FROM partida WHERE id_sucursal = ? AND estado = 'FINALIZADA' ORDER BY puntaje_total DESC";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, idSucursal);
             ResultSet rs = ps.executeQuery();
@@ -60,7 +60,7 @@ public class PartidaDAO {
     
     public List<Partida> obtenerPorUsuario(int idUsuario) throws SQLException {
         List<Partida> lista = new ArrayList<>();
-        String sql = "SELECT * FROM partidas WHERE id_usuario = ? ORDER BY fecha_inicio DESC";
+        String sql = "SELECT * FROM partida WHERE id_usuario = ? ORDER BY fecha_inicio DESC";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, idUsuario);
             ResultSet rs = ps.executeQuery();
@@ -71,7 +71,7 @@ public class PartidaDAO {
 
     public List<Partida> obtenerFinalizadas() throws SQLException {
         List<Partida> lista = new ArrayList<>();
-        String sql = "SELECT * FROM partidas WHERE estado = 'FINALIZADA' ORDER BY puntaje_total DESC";
+        String sql = "SELECT * FROM partida WHERE estado = 'FINALIZADA' ORDER BY puntaje_total DESC";
         try (PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) lista.add(mapear(rs));
@@ -80,7 +80,7 @@ public class PartidaDAO {
     }
    
     public boolean ingresar(Partida p) throws SQLException {
-        String sql = "INSERT INTO partidas (id_usuario, id_sucursal, fecha_inicio, estado, puntaje_total, nivel_maximo, pedidos_completados, pedidos_cancelados, pedidos_no_entregados) VALUES (?,?,NOW(),'EN_CURSO',0,1,0,0,0)";
+        String sql = "INSERT INTO partida (id_usuario, id_sucursal, fecha_inicio, estado, puntaje_total, nivel_maximo, pedidos_completados, pedidos_cancelados, pedidos_no_entregados) VALUES (?,?,NOW(),'EN_CURSO',0,1,0,0,0)";
         try (PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setInt(1, p.getUsuario().getIdUsuario());
             ps.setInt(2, p.getSucursal().getIdSucursal());
@@ -94,7 +94,7 @@ public class PartidaDAO {
     }
     
     public boolean actualizar(Partida p) throws SQLException {
-        String sql = "UPDATE partidas SET estado=?, puntaje_total=?, nivel_maximo=?, " +
+        String sql = "UPDATE partida SET estado=?, puntaje_total=?, nivel_maximo=?, " +
                      "pedidos_completados=?, pedidos_cancelados=?, pedidos_no_entregados=?, fecha_fin=NOW() " +
                      "WHERE id_partida=?";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -110,7 +110,7 @@ public class PartidaDAO {
     }
     
     public boolean elminar(int id) throws SQLException {
-        String sql = "UPDATE partidas SET estado = 'ABANDONADA' WHERE id_partida = ?";
+        String sql = "UPDATE partida SET estado = 'ABANDONADA' WHERE id_partida = ?";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
             return ps.executeUpdate() > 0;
@@ -128,6 +128,8 @@ public class PartidaDAO {
         p.setPedidosCompletados(rs.getInt("pedidos_completados"));
         p.setPedidosCancelados(rs.getInt("pedidos_cancelados"));
         p.setPedidosNoEntregados(rs.getInt("pedidos_no_entregados"));
+        Timestamp ts = rs.getTimestamp("fecha_inicio");
+        if (ts != null) p.setFechaInicio(ts.toLocalDateTime());
         return p;
     }
 }

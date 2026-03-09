@@ -68,7 +68,7 @@ public class ProductoDAO {
     }
     
     public boolean ingresar(Producto p) throws SQLException {
-        String sql = "INSERT INTO productos (nombre, descripcion, precio, categoria, imagen_ruta, activo) VALUES (?,?,?,?,?,?)";
+        String sql = "INSERT INTO productos (nombre, descripcion, precio, categoria, imagen, activo) VALUES (?,?,?,?,?,?)";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, p.getNombre());
             ps.setString(2, p.getDescripcion());
@@ -81,7 +81,7 @@ public class ProductoDAO {
     }
     
     public boolean actualizar(Producto p) throws SQLException {
-        String sql = "UPDATE productos SET nombre=?, descripcion=?, precio=?, categoria=?, imagen_ruta=?, activo=? WHERE id_producto=?";
+        String sql = "UPDATE productos SET nombre=?, descripcion=?, precio=?, categoria=?, imagen=?, activo=? WHERE id_producto=?";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, p.getNombre());
             ps.setString(2, p.getDescripcion());
@@ -109,7 +109,7 @@ public class ProductoDAO {
             rs.getString("descripcion"),
             rs.getDouble("precio"),
             rs.getString("categoria"),
-            rs.getString("imagen_ruta"),
+            rs.getString("imagen"),
             rs.getBoolean("activo")
         );
     }

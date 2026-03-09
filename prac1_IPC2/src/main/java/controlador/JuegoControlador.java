@@ -47,7 +47,7 @@ public class JuegoControlador {
         nivelActual       = 1;
         turnoRestante     = duracionTurno;
         contadorPedidos   = 0;
-        segundosSinGenerar = 0;
+        segundosSinGenerar = intervaloGeneracion;
 
         partida = new Partida();
         partida.setUsuario(jugador);
@@ -65,19 +65,18 @@ public class JuegoControlador {
         turnoRestante--;
         segundosSinGenerar++;
 
+        pedidosActivos.removeIf(p -> p.getEstado().esFinalizado());
         // Verificar pedidos vencidos
         for (Pedido p : new ArrayList<>(pedidosActivos)) {
-            if (!p.getEstado().esFinalizado()) {
-                p.disminuirTiempo();
-                if (p.tiempoAgotado()) {
-                    cambiarEstado(p, EstadoPedido.NO_ENTREGADO, Origen.COMPU);
-                    partida.incrementarNoEntregados();
-                    partida.sumarPuntos(puntosNoEntregado);
-                }
+            p.disminuirTiempo();
+            if (p.tiempoAgotado()) {
+                cambiarEstado(p, EstadoPedido.NO_ENTREGADO, Origen.SISTEMA);
+                partida.incrementarNoEntregados();
+                partida.sumarPuntos(puntosNoEntregado);
             }
         }
 
-        pedidosActivos.removeIf(p -> p.getEstado().esFinalizado());
+        
 
         // Generar nuevo pedido si corresponde
         if (segundosSinGenerar >= intervaloGeneracion &&
@@ -156,7 +155,7 @@ public class JuegoControlador {
             }
         }
 
-        registrarHistorial(p, null, EstadoPedido.RECIBIDA, Origen.COMPU);
+        registrarHistorial(p, null, EstadoPedido.RECIBIDA, Origen.SISTEMA);
         pedidosActivos.add(p);
     }
 
@@ -208,7 +207,7 @@ public class JuegoControlador {
         // Penalizar pedidos activos restantes
         for (Pedido p : pedidosActivos) {
             if (!p.getEstado().esFinalizado()) {
-                cambiarEstado(p, EstadoPedido.NO_ENTREGADO, Origen.COMPU);
+                cambiarEstado(p, EstadoPedido.NO_ENTREGADO, Origen.SISTEMA);
                 partida.sumarPuntos(puntosNoEntregado);
                 partida.incrementarNoEntregados();
                 pedidoDAO.actualizar(p);

@@ -25,9 +25,11 @@ public class JuegoVista extends JFrame{
     private JLabel     lblTurno;
     private JLabel     lblPuntaje;
     private JLabel     lblNivel;
+    private JLabel     lblMensaje;
     private JPanel     panelPedidos;
     private JScrollPane scrollPedidos;
     private javax.swing.Timer timerJuego;
+    private javax.swing.Timer timerMensaje;
 
     public JuegoVista(JFrame menuParent) {
         this.menuParent = menuParent;
@@ -65,6 +67,7 @@ public class JuegoVista extends JFrame{
         panelPedidos.setLayout(new BoxLayout(panelPedidos, BoxLayout.Y_AXIS));
         panelPedidos.setBackground(new Color(44, 62, 80));
 
+        lblMensaje = new JLabel(" ", SwingConstants.CENTER);
         scrollPedidos = new JScrollPane(panelPedidos);
         scrollPedidos.setBorder(BorderFactory.createTitledBorder(
             BorderFactory.createLineBorder(Color.GRAY), "Pedidos Activos",
@@ -175,7 +178,7 @@ public class JuegoVista extends JFrame{
                 BorderFactory.createEmptyBorder(8, 10, 8, 10)
             ));
             setBackground(new Color(52, 73, 94));
-            setMaximumSize(new Dimension(Integer.MAX_VALUE, 90));
+            setMaximumSize(new Dimension(Integer.MAX_VALUE, 150));
 
             // Info izquierda
             JPanel infoPanel = new JPanel(new GridLayout(3, 1, 0, 2));
@@ -184,7 +187,7 @@ public class JuegoVista extends JFrame{
             JLabel lblNum = new JLabel("Pedido #" + pedido.getNumeroPedido() +
                 "  |  Estado: " + pedido.getEstado().name());
             lblNum.setFont(new Font("Arial", Font.BOLD, 13));
-            lblNum.setForeground(Color.WHITE);
+            lblNum.setForeground(Color.black);
 
             JLabel lblProductos = new JLabel(pedido.getResumenProducto());
             lblProductos.setFont(new Font("Arial", Font.PLAIN, 12));
@@ -204,23 +207,24 @@ public class JuegoVista extends JFrame{
             // Botones derecha
             JPanel panelBtns = new JPanel(new GridLayout(1, 2, 5, 0));
             panelBtns.setOpaque(false);
-
+            panelBtns.setPreferredSize(new Dimension(180, 70));
+            
             JButton btnAvanzar = new JButton("Avanzar");
             btnAvanzar.setBackground(new Color(39, 174, 96));
-            btnAvanzar.setForeground(Color.WHITE);
+            btnAvanzar.setForeground(Color.BLACK);
             btnAvanzar.setFocusPainted(false);
             btnAvanzar.setEnabled(!pedido.getEstado().esFinalizado());
             btnAvanzar.addActionListener(e -> {
                 try {
                     String msg = controller.avanzarEstado(pedido);
-                    JOptionPane.showMessageDialog(JuegoVista.this, msg, "Estado actualizado",
-                        JOptionPane.INFORMATION_MESSAGE);
+                    mostrarMensaje(msg, false);
+                    actualizarPedidos();
                 } catch (SQLException ex) { ex.printStackTrace(); }
             });
 
             JButton btnCancelar = new JButton("Cancelar");
             btnCancelar.setBackground(new Color(192, 57, 43));
-            btnCancelar.setForeground(Color.WHITE);
+            btnCancelar.setForeground(Color.BLACK);
             btnCancelar.setFocusPainted(false);
             btnCancelar.setEnabled(pedido.getEstado().sePuedeCancelar());
             btnCancelar.addActionListener(e -> {
@@ -229,8 +233,10 @@ public class JuegoVista extends JFrame{
                         "Cancelar pedido #" + pedido.getNumeroPedido() + "?",
                         "Cancelar pedido", JOptionPane.YES_NO_OPTION);
                     if (op == JOptionPane.YES_OPTION) {
-                        String msg = controller.cancelarPedido(pedido);
-                        JOptionPane.showMessageDialog(JuegoVista.this, msg);
+                        timerJuego.stop();         
+                        controller.cancelarPedido(pedido);
+                        actualizarPedidos();
+                        timerJuego.start();   
                     }
                 } catch (SQLException ex) { ex.printStackTrace(); }
             });
@@ -249,6 +255,13 @@ public class JuegoVista extends JFrame{
                 case CANCELADA:  return new Color(149, 165, 166);
                 default:         return new Color(192, 57, 43);
             }
+        }
+        private void mostrarMensaje(String texto, boolean esError) {
+            lblMensaje.setText(texto);
+            // timer de 2500ms que borra el texto solo
+            timerMensaje = new javax.swing.Timer(2500, e -> lblMensaje.setText(" "));
+            timerMensaje.setRepeats(false);
+            timerMensaje.start();
         }
     }
 }

@@ -7,6 +7,7 @@ package vista;
 import controlador.LoginControlador;
 import modelo.Usuario;
 import modelo.Constantes;
+import vista.superadmin.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -41,7 +42,7 @@ public class MenuPrincipalVista extends JFrame{
 
         JLabel lblBienvenido = new JLabel("Bienvenido, " + usuario.getNombreCompleto(), SwingConstants.CENTER);
         lblBienvenido.setFont(new Font("Arial", Font.BOLD, 18));
-        lblBienvenido.setForeground(Color.WHITE);
+        lblBienvenido.setForeground(Color.BLACK);
 
         JLabel lblRol = new JLabel("Rol: " + usuario.getRol().getNombre(), SwingConstants.CENTER);
         lblRol.setFont(new Font("Arial", Font.PLAIN, 13));
@@ -81,11 +82,11 @@ public class MenuPrincipalVista extends JFrame{
 
         if (Constantes.ROL_SUPER_ADMIN.equals(rol)) {
             panelBotones.add(crearBoton("Gestionar Sucursales", new Color(39, 174, 96),
-                e -> new vista.superadmin.GestionSucursalesVista()));
+                e -> new GestionSucursalesVista()));
             panelBotones.add(crearBoton("Gestionar Usuarios", new Color(41, 128, 185),
-                e -> new vista.superadmin.GestionUsuariosVista()));
+                e -> new GestionUsuariosVista()));
             panelBotones.add(crearBoton("Parametros del Juego", new Color(142, 68, 173),
-                e -> new vista.superadmin.ParametrosJuegoVista()));
+                e -> new ParametrosJuegoVista()));
             panelBotones.add(crearBoton("Estadisticas Globales", new Color(230, 126, 34),
                 e -> new ReportesVista()));
             panelBotones.add(crearBoton("Ranking Global", new Color(22, 160, 133),

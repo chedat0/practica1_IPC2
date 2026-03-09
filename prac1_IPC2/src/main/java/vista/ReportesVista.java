@@ -68,7 +68,7 @@ public class ReportesVista extends JFrame {
         tabla.setGridColor(new Color(44, 62, 80));
         tabla.setRowHeight(24);
         tabla.getTableHeader().setBackground(new Color(41, 128, 185));
-        tabla.getTableHeader().setForeground(Color.WHITE);
+        tabla.getTableHeader().setForeground(Color.black);
         tabla.getTableHeader().setFont(new Font("Arial", Font.BOLD, 12));
         tabla.setSelectionBackground(new Color(41, 128, 185));
         panel.add(new JScrollPane(tabla), BorderLayout.CENTER);
@@ -78,7 +78,7 @@ public class ReportesVista extends JFrame {
 
         JButton btnExportar = new JButton("Exportar CSV");
         btnExportar.setBackground(new Color(39, 174, 96));
-        btnExportar.setForeground(Color.WHITE);
+        btnExportar.setForeground(Color.black);
         btnExportar.setFocusPainted(false);
         btnExportar.addActionListener(e -> exportarCSV());
         panelBtns.add(btnExportar);

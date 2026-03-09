@@ -54,7 +54,7 @@ public class FinPartidaVista extends JFrame {
 
         JButton btnMenu = new JButton("Menu Principal");
         btnMenu.setBackground(new Color(41, 128, 185));
-        btnMenu.setForeground(Color.WHITE);
+        btnMenu.setForeground(Color.BLACK);
         btnMenu.setFocusPainted(false);
         btnMenu.addActionListener(e -> {
             dispose();
@@ -63,7 +63,7 @@ public class FinPartidaVista extends JFrame {
 
         JButton btnRanking = new JButton("Ver Ranking");
         btnRanking.setBackground(new Color(142, 68, 173));
-        btnRanking.setForeground(Color.WHITE);
+        btnRanking.setForeground(Color.BLACK);
         btnRanking.setFocusPainted(false);
         btnRanking.addActionListener(e -> new RankingVista());
 

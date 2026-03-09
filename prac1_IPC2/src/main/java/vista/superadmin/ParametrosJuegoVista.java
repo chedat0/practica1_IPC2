@@ -22,8 +22,8 @@ public class ParametrosJuegoVista extends JFrame {
     private final SuperAdminControlador controller = new SuperAdminControlador();
     private JTable            tabla;
     private DefaultTableModel modeloTabla;
-    private JTextField        txtValor;
-    private JLabel            lblClave, lblDescripcion;
+    private JTextField        txtClave, txtValor, txtDescripcion; 
+    private JButton           btnGuardar, btnNuevo;
     private List<ParametroJuego> parametros;
 
     public ParametrosJuegoVista() {
@@ -52,7 +52,7 @@ public class ParametrosJuegoVista extends JFrame {
         tabla.setGridColor(new Color(44, 62, 80));
         tabla.setRowHeight(24);
         tabla.getTableHeader().setBackground(new Color(41, 128, 185));
-        tabla.getTableHeader().setForeground(Color.WHITE);
+        tabla.getTableHeader().setForeground(Color.black);
         tabla.getTableHeader().setFont(new Font("Arial", Font.BOLD, 12));
         tabla.setSelectionBackground(new Color(41, 128, 185));
         tabla.getSelectionModel().addListSelectionListener(e -> seleccionar());
@@ -69,32 +69,38 @@ public class ParametrosJuegoVista extends JFrame {
         gbc.insets = new Insets(8, 10, 8, 10);
         gbc.fill   = GridBagConstraints.HORIZONTAL;
 
-        lblClave = new JLabel("Selecciona un parametro");
-        lblClave.setForeground(new Color(241, 196, 15));
-        lblClave.setFont(new Font("Arial", Font.BOLD, 13));
-        gbc.gridx = 0; gbc.gridy = 0; gbc.gridwidth = 2;
-        panelEdit.add(lblClave, gbc);
+        txtClave       = new JTextField(18);
+        txtValor       = new JTextField(18);
+        txtDescripcion = new JTextField(18);
 
-        lblDescripcion = new JLabel("");
-        lblDescripcion.setForeground(new Color(189, 195, 199));
-        lblDescripcion.setFont(new Font("Arial", Font.PLAIN, 11));
-        gbc.gridy = 1;
-        panelEdit.add(lblDescripcion, gbc);
+        agregarCampo(panelEdit, gbc, "Clave *:",       txtClave,       0);
+        agregarCampo(panelEdit, gbc, "Valor *:",       txtValor,       1);
+        agregarCampo(panelEdit, gbc, "Descripcion:",   txtDescripcion, 2);
 
-        gbc.gridy = 2; gbc.gridwidth = 1;
-        JLabel lv = new JLabel("Nuevo valor:"); lv.setForeground(Color.WHITE);
-        panelEdit.add(lv, gbc);
-        gbc.gridx = 1;
-        txtValor = new JTextField(12);
-        panelEdit.add(txtValor, gbc);
 
-        JButton btnGuardar = new JButton("Guardar");
-        btnGuardar.setBackground(new Color(41, 128, 185));
-        btnGuardar.setForeground(Color.WHITE);
-        btnGuardar.setFocusPainted(false);
-        btnGuardar.addActionListener(e -> guardar());
-        gbc.gridx = 0; gbc.gridy = 3; gbc.gridwidth = 2;
-        panelEdit.add(btnGuardar, gbc);
+        gbc.gridy = 4;
+        JTextArea txtAviso = new JTextArea(
+            "Selecciona un parametro de la tabla para editarlo, " +
+            "o completa todos los campos para crear uno nuevo.");
+        txtAviso.setLineWrap(true);
+        txtAviso.setWrapStyleWord(true);
+        txtAviso.setEditable(false);
+        txtAviso.setOpaque(false);
+        txtAviso.setForeground(new Color(189, 195, 199));
+        txtAviso.setFont(new Font("Arial", Font.ITALIC, 11));
+        txtAviso.setPreferredSize(new Dimension(220, 50));
+        panelEdit.add(txtAviso, gbc);
+        
+        
+        JPanel btns = new JPanel(new GridLayout(2, 1, 0, 8));
+        btns.setOpaque(false);
+        btns.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 0));
+
+        btns.add(crearBoton("Limpiar",   new Color(39, 174, 96),  e -> limpiar()));
+        btns.add(crearBoton("Guardar",  new Color(192, 57, 43),  e -> guardar()));
+        
+        gbc.gridy = 5;
+        panelEdit.add(btns, gbc);
 
         panel.add(panelEdit, BorderLayout.EAST);
         add(panel);
@@ -118,24 +124,79 @@ public class ParametrosJuegoVista extends JFrame {
         int f = tabla.getSelectedRow();
         if (f < 0 || f >= parametros.size()) return;
         ParametroJuego p = parametros.get(f);
-        lblClave.setText(p.getClave());
-        lblDescripcion.setText(p.getDescripcion() != null ? p.getDescripcion() : "");
+        txtClave.setText(p.getClave());
         txtValor.setText(p.getValor());
+        txtDescripcion.setText(p.getDescripcion() != null ? p.getDescripcion() : "");
+        txtClave.setEditable(false);
+        txtClave.setBackground(new Color(200, 200, 200));
     }
 
     private void guardar() {
-        int f = tabla.getSelectedRow();
-        if (f < 0) { JOptionPane.showMessageDialog(this, "Selecciona un parametro."); return; }
-        String nuevoValor = txtValor.getText().trim();
-        if (nuevoValor.isEmpty()) { JOptionPane.showMessageDialog(this, "El valor no puede estar vacio."); return; }
-        try {
-            ParametroJuego p = parametros.get(f);
-            p.setValor(nuevoValor);
-            controller.actualizarParametro(p);
-            JOptionPane.showMessageDialog(this, "Parametro actualizado correctamente.");
-            cargarParametros();
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
+        String clave = txtClave.getText().trim();
+        String valor = txtValor.getText().trim();
+
+        if (clave.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "La clave es obligatoria.",
+                "Campo requerido", JOptionPane.WARNING_MESSAGE);
+            txtClave.requestFocus();
+            return;
         }
+        if (valor.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "El valor es obligatorio.",
+                "Campo requerido", JOptionPane.WARNING_MESSAGE);
+            txtValor.requestFocus();
+            return;
+        }
+
+        try {
+            int fila = tabla.getSelectedRow();
+            if (fila >= 0 && fila < parametros.size()) {
+                // Editar parametro existente (solo cambia valor y descripcion)
+                ParametroJuego p = parametros.get(fila);
+                p.setValor(valor);
+                p.setDescripcion(txtDescripcion.getText().trim());
+                controller.actualizarParametro(p);
+                JOptionPane.showMessageDialog(this, "Parametro actualizado correctamente.");
+            } else {
+                // Crear parametro nuevo
+                ParametroJuego nuevo = new ParametroJuego();
+                nuevo.setClave(clave.toUpperCase().replace(" ", "_"));
+                nuevo.setValor(valor);
+                nuevo.setDescripcion(txtDescripcion.getText().trim());
+                controller.guardarParametro(nuevo);
+                JOptionPane.showMessageDialog(this, "Parametro creado correctamente.");
+            }
+            cargarParametros();
+            limpiar();
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Error al guardar: " + e.getMessage());
+        }
+    }
+
+    private void limpiar() {
+        tabla.clearSelection();
+        txtClave.setText("");
+        txtClave.setEditable(true);
+        txtClave.setBackground(Color.WHITE);
+        txtValor.setText("");
+        txtDescripcion.setText("");
+        txtClave.requestFocus();
+    }
+  
+    private void agregarCampo(JPanel p, GridBagConstraints gbc,
+                               String etiqueta, JTextField campo, int fila) {
+        gbc.gridx = 0; gbc.gridy = fila; gbc.gridwidth = 1;
+        JLabel lbl = new JLabel(etiqueta);
+        lbl.setForeground(Color.WHITE);
+        lbl.setFont(new Font("Arial", Font.PLAIN, 13));
+        p.add(lbl, gbc);
+        gbc.gridx = 1;
+        p.add(campo, gbc);
+    }
+    
+    private JButton crearBoton(String txt, Color bg, java.awt.event.ActionListener a) {
+        JButton b = new JButton(txt);
+        b.setBackground(bg); b.setForeground(Color.black);
+        b.setFocusPainted(false); b.addActionListener(a); return b;
     }
 }

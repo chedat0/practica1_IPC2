@@ -147,7 +147,7 @@ public class Pedido {
     }
     
     public boolean tiempoAgotado (){
-        return tiempoRestante <= 0;       
+        return tiempoLimiteDeg > 0 && tiempoRestante <= 0 ; 
     }
     
     public String getResumenProducto(){

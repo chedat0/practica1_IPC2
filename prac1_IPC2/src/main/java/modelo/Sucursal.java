@@ -54,6 +54,11 @@ public class Sucursal {
     public void setActiva(boolean activa) {
         this.activa = activa;
     }
+
+    @Override
+    public String toString() {
+        return nombre;
+    }
     
     
 }

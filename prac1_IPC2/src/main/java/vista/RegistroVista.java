@@ -109,14 +109,14 @@ public class RegistroVista extends JFrame{
 
         btnRegistrar = new JButton("Registrarse");
         btnRegistrar.setBackground(new Color(39, 174, 96));
-        btnRegistrar.setForeground(Color.WHITE);
+        btnRegistrar.setForeground(Color.BLACK);
         btnRegistrar.setFont(new Font("Arial", Font.BOLD, 14));
         btnRegistrar.setFocusPainted(false);
         btnRegistrar.addActionListener(e -> registrar());
 
         btnVolver = new JButton("Volver");
         btnVolver.setBackground(new Color(127, 140, 141));
-        btnVolver.setForeground(Color.WHITE);
+        btnVolver.setForeground(Color.BLACK);
         btnVolver.setFont(new Font("Arial", Font.BOLD, 14));
         btnVolver.setFocusPainted(false);
         btnVolver.addActionListener(e -> volver());

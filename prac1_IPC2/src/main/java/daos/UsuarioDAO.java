@@ -37,7 +37,7 @@ public class UsuarioDAO {
     }
 
     public Usuario encontrarPorUsuario(String usuario, String contraseña) throws SQLException {
-        String sql = "SELECT * FROM usuarios WHERE username = ? AND contraseña = ? AND activo = TRUE";
+        String sql = "SELECT * FROM usuarios WHERE usuario = ? AND contraseña = ? AND activo = TRUE";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, usuario);
             ps.setString (2,contraseña);
@@ -59,7 +59,7 @@ public class UsuarioDAO {
     }
 
     public boolean existeUsuario(String username) throws SQLException {
-        String sql = "SELECT COUNT(*) FROM usuarios WHERE username = ?";
+        String sql = "SELECT COUNT(*) FROM usuarios WHERE usuario = ?";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, username);
             ResultSet rs = ps.executeQuery();
@@ -80,7 +80,7 @@ public class UsuarioDAO {
     }
     
     public boolean ingresar(Usuario u) throws SQLException {
-        String sql = "INSERT INTO usuarios (username, password_hash, nombre, apellido, email, id_rol, id_sucursal, activo) VALUES (?,?,?,?,?,?,?,?)";
+        String sql = "INSERT INTO usuarios (usuario, contraseña, nombre, apellido, email, id_rol, id_sucursal, activo) VALUES (?,?,?,?,?,?,?,?)";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, u.getUsuario());
             ps.setString(2, u.getContraseña());
@@ -121,8 +121,8 @@ public class UsuarioDAO {
     private Usuario mapear(ResultSet rs) throws SQLException {
         Usuario u = new Usuario();
         u.setIdUsuario(rs.getInt("id_usuario"));
-        u.setUsuario(rs.getString("username"));
-        u.setContraseña(rs.getString("password_hash"));
+        u.setUsuario(rs.getString("usuario"));
+        u.setContraseña(rs.getString("contraseña"));
         u.setNombre(rs.getString("nombre"));
         u.setApellido(rs.getString("apellido"));
         u.setEmail(rs.getString("email"));

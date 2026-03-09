@@ -69,11 +69,11 @@ public class HistorialPersonalVista extends JFrame{
         };
         tabla = new JTable(modeloTabla);
         tabla.setBackground(new Color(52, 73, 94));
-        tabla.setForeground(Color.WHITE);
+        tabla.setForeground(Color.black);
         tabla.setGridColor(new Color(44, 62, 80));
         tabla.setRowHeight(26);
         tabla.getTableHeader().setBackground(new Color(41, 128, 185));
-        tabla.getTableHeader().setForeground(Color.WHITE);
+        tabla.getTableHeader().setForeground(Color.BLACK);
         tabla.getTableHeader().setFont(new Font("Arial", Font.BOLD, 12));
         tabla.setFont(new Font("Arial", Font.PLAIN, 12));
         tabla.setSelectionBackground(new Color(41, 128, 185));
@@ -86,7 +86,7 @@ public class HistorialPersonalVista extends JFrame{
         
         JButton btnCerrar = new JButton("Cerrar");
         btnCerrar.setBackground(new Color(127, 140, 141));
-        btnCerrar.setForeground(Color.WHITE);
+        btnCerrar.setForeground(Color.black);
         btnCerrar.setFocusPainted(false);
         btnCerrar.addActionListener(e -> dispose());
         JPanel panelSur = new JPanel(new FlowLayout(FlowLayout.RIGHT));
@@ -141,7 +141,7 @@ public class HistorialPersonalVista extends JFrame{
     private JLabel crearLabelResumen(String texto) {
         JLabel lbl = new JLabel(texto);
         lbl.setFont(new Font("Arial", Font.BOLD, 13));
-        lbl.setForeground(Color.WHITE);
+        lbl.setForeground(Color.black);
         return lbl;
     }
 }

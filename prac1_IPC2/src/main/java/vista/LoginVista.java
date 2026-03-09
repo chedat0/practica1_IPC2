@@ -65,7 +65,7 @@ public class LoginVista extends JFrame{
 
         // Campo contraseña
         gbc.gridx = 0; gbc.gridy = 1;
-        JLabel lblPass = new JLabel("Contrasena:");
+        JLabel lblPass = new JLabel("Contraseña:");
         lblPass.setForeground(Color.WHITE);
         panelForm.add(lblPass, gbc);
 
@@ -77,7 +77,7 @@ public class LoginVista extends JFrame{
         gbc.gridx = 0; gbc.gridy = 2; gbc.gridwidth = 2;
         btnLogin = new JButton("Iniciar Sesion");
         btnLogin.setBackground(new Color(231, 76, 60));
-        btnLogin.setForeground(Color.WHITE);
+        btnLogin.setForeground(Color.BLACK);
         btnLogin.setFont(new Font("Arial", Font.BOLD, 14));
         btnLogin.setFocusPainted(false);
         panelForm.add(btnLogin, gbc);
@@ -99,7 +99,7 @@ public class LoginVista extends JFrame{
         gbc.gridy = 5;
         btnRegistro = new JButton("Crear Cuenta");
         btnRegistro.setBackground(new Color(39, 174, 96));
-        btnRegistro.setForeground(Color.WHITE);
+        btnRegistro.setForeground(Color.BLACK);
         btnRegistro.setFont(new Font("Arial", Font.BOLD, 14));
         btnRegistro.setFocusPainted(false);
         panelForm.add(btnRegistro, gbc);
@@ -124,7 +124,7 @@ public class LoginVista extends JFrame{
         String password = new String(txtPassword.getPassword());
 
         if (username.isEmpty() || password.isEmpty()) {
-            lblMensaje.setText("Ingresa usuario y contrasena.");
+            lblMensaje.setText("Ingresa usuario y contraseña.");
             return;
         }
 

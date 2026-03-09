@@ -44,7 +44,7 @@ public class SucursalDAO {
     }
     
     public boolean ingresar(Sucursal s) throws SQLException {
-        String sql = "INSERT INTO sucursales (nombre, direccion, telefono, activa) VALUES (?,?,?,?)";
+        String sql = "INSERT INTO sucursales (nombre, direccion, activa) VALUES (?,?,?,?)";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, s.getNombre());
             ps.setString(2, s.getDirección());            
@@ -54,7 +54,7 @@ public class SucursalDAO {
     }
     
     public boolean actualizar(Sucursal s) throws SQLException {
-        String sql = "UPDATE sucursales SET nombre=?, direccion=?, telefono=?, activa=? WHERE id_sucursal=?";
+        String sql = "UPDATE sucursales SET nombre=?, direccion=?, activa=? WHERE id_sucursal=?";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, s.getNombre());
             ps.setString(2, s.getDirección());

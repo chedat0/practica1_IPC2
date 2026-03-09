@@ -73,6 +73,10 @@ public class SuperAdminControlador {
     public List<ParametroJuego> obtenerParametros() throws SQLException {
         return parametroDAO.obtenerTodos();
     }
+    
+    public boolean guardarParametro (ParametroJuego p) throws SQLException {
+        return parametroDAO.ingresar(p);
+    }
 
     public boolean actualizarParametro(ParametroJuego p) throws SQLException {
         return parametroDAO.actualizar(p);

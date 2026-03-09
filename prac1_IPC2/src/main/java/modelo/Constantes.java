@@ -10,7 +10,7 @@ package modelo;
  */
 public class Constantes {
      // Roles
-    public static final String ROL_SUPER_ADMIN  = "SUPER_ADMIN";
+    public static final String ROL_SUPER_ADMIN  = "SUPER_ADMINISTRADOR";
     public static final String ROL_ADMIN_TIENDA = "ADMIN_TIENDA";
     public static final String ROL_JUGADOR      = "JUGADOR";
     

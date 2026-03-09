@@ -49,7 +49,7 @@ public class NivelPartidaDAO {
     }
    
     public boolean ingresar (NivelPartida n) throws SQLException {
-        String sql = "INSERT INTO niveles_partida (id_partida, nivel, fecha_alcanzado, puntaje_al_alcanzar, pedidos_al_alcanzar) VALUES (?,?,NOW(),?,?)";
+        String sql = "INSERT INTO niveles_partida (id_partida, nivel, fecha_alcanzado, puntaje_por_alcanzar, pedidos_por_alcanzar) VALUES (?,?,NOW(),?,?)";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, n.getIdPartida());
             ps.setInt(2, n.getNivel());
@@ -68,8 +68,8 @@ public class NivelPartidaDAO {
         n.setIdNivelPartida(rs.getInt("id_nivel_partida"));
         n.setIdPartida(rs.getInt("id_partida"));
         n.setNivel(rs.getInt("nivel"));
-        n.setPuntajeAlAlcanzar(rs.getInt("puntaje_al_alcanzar"));
-        n.setPedidosAlAlcanzar(rs.getInt("pedidos_al_alcanzar"));
+        n.setPuntajeAlAlcanzar(rs.getInt("puntaje_por_alcanzar"));
+        n.setPedidosAlAlcanzar(rs.getInt("pedidos_por_alcanzar"));
         return n;
     }
 }

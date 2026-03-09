@@ -10,9 +10,9 @@ package modelo.enums;
  */
 public enum Origen {
     JUGADOR,
-    COMPU;
+    SISTEMA;
     
     public static Origen fromString (String s){
-    return (s != null && s.equalsIgnoreCase("COMPU")) ? COMPU : JUGADOR; 
+    return (s != null && s.equalsIgnoreCase("SISTEMA")) ? SISTEMA : JUGADOR; 
     }
 }
