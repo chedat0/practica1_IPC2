@@ -48,7 +48,7 @@ public class RegistroVista extends JFrame{
         JPanel panelPrincipal = new JPanel(new BorderLayout());
         panelPrincipal.setBackground(new Color(44, 62, 80));
 
-        // ── Encabezado ───────────────────────────────────────
+        // Encabezado
         JPanel panelTop = new JPanel(new GridLayout(2, 1));
         panelTop.setBackground(new Color(44, 62, 80));
         panelTop.setBorder(BorderFactory.createEmptyBorder(20, 10, 5, 10));
@@ -65,7 +65,7 @@ public class RegistroVista extends JFrame{
         panelTop.add(lblSub);
         panelPrincipal.add(panelTop, BorderLayout.NORTH);
 
-        // ── Formulario ───────────────────────────────────────
+        // Formulario
         JPanel panelForm = new JPanel(new GridBagLayout());
         panelForm.setBackground(new Color(44, 62, 80));
         panelForm.setBorder(BorderFactory.createEmptyBorder(10, 40, 5, 40));
@@ -83,8 +83,8 @@ public class RegistroVista extends JFrame{
         cmbSucursal          = new JComboBox<>();
 
         agregarCampo(panelForm, gbc, "Usuario *",            txtUsername,          0);
-        agregarCampo(panelForm, gbc, "Contrasena *",         txtPassword,          1);
-        agregarCampo(panelForm, gbc, "Confirmar contrasena *", txtConfirmarPassword, 2);
+        agregarCampo(panelForm, gbc, "Contraseña *",         txtPassword,          1);
+        agregarCampo(panelForm, gbc, "Confirmar contraseña *", txtConfirmarPassword, 2);
         agregarCampo(panelForm, gbc, "Nombre *",             txtNombre,            3);
         agregarCampo(panelForm, gbc, "Apellido",             txtApellido,          4);
         agregarCampo(panelForm, gbc, "Email",                txtEmail,             5);
@@ -173,7 +173,7 @@ public class RegistroVista extends JFrame{
         String email     = txtEmail.getText().trim();
         Sucursal sucursal = (Sucursal) cmbSucursal.getSelectedItem();
 
-        // ── Validaciones ─────────────────────────────────────
+        // ── Validaciones 
         if (username.isEmpty()) {
             mostrarError("El nombre de usuario es obligatorio.");
             txtUsername.requestFocus();
@@ -185,17 +185,17 @@ public class RegistroVista extends JFrame{
             return;
         }
         if (password.isEmpty()) {
-            mostrarError("La contrasena es obligatoria.");
+            mostrarError("La contraseña es obligatoria.");
             txtPassword.requestFocus();
             return;
         }
         if (password.length() < 4) {
-            mostrarError("La contrasena debe tener al menos 4 caracteres.");
+            mostrarError("La contraseña debe tener al menos 4 caracteres.");
             txtPassword.requestFocus();
             return;
         }
         if (!password.equals(confirmar)) {
-            mostrarError("Las contrasenas no coinciden.");
+            mostrarError("Las contraseñas no coinciden.");
             txtConfirmarPassword.setText("");
             txtConfirmarPassword.requestFocus();
             return;
@@ -210,7 +210,7 @@ public class RegistroVista extends JFrame{
             return;
         }
 
-        // ── Guardar en BD ─────────────────────────────────────
+        // ── Guardar en BD 
         try {
             UsuarioDAO usuarioDAO = new UsuarioDAO();
             RolDAO     rolDAO     = new RolDAO();
@@ -232,7 +232,7 @@ public class RegistroVista extends JFrame{
             // Construir el usuario
             Usuario nuevo = new Usuario();
             nuevo.setUsuario(username);
-            nuevo.setContraseña(password);   // Sin hash, directo
+            nuevo.setContraseña(password); 
             nuevo.setNombre(nombre);
             nuevo.setApellido(apellido.isEmpty() ? null : apellido);
             nuevo.setEmail(email.isEmpty() ? null : email);

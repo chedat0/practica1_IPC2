@@ -5,20 +5,19 @@ CREATE TABLE roles (
     id_rol         INT AUTO_INCREMENT PRIMARY KEY,
     nombre         VARCHAR(100)  NOT NULL UNIQUE,
     descripcion    VARCHAR(255),
-    activo         BOOLEAN      NOT NULL DEFAULT TRUE,
-    fecha_creacion DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    fecha_modificacion DATETIME ON UPDATE CURRENT_TIMESTAMP
+    activo         BOOLEAN      NOT NULL DEFAULT TRUE 
 );
+ALTER TABLE roles DROP COLUMN fecha_creacion;
+ALTER TABLE roles DROP COLUMN fecha_modificacion;
 
 CREATE TABLE sucursales (
     id_sucursal    INT AUTO_INCREMENT PRIMARY KEY,
     nombre         VARCHAR(100) NOT NULL,
     direccion      VARCHAR(250),
     telefono       VARCHAR(10),
-    activa         BOOLEAN      NOT NULL DEFAULT TRUE,
-    fecha_creacion DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    fecha_modificacion DATETIME ON UPDATE CURRENT_TIMESTAMP
+    activa         BOOLEAN      NOT NULL DEFAULT TRUE   
 );
+
 
 CREATE TABLE usuarios (
     id_usuario     INT AUTO_INCREMENT PRIMARY KEY,
@@ -29,12 +28,11 @@ CREATE TABLE usuarios (
     email          VARCHAR(100) UNIQUE,
     id_rol         INT NOT NULL,
     id_sucursal    INT,                    
-    activo         BOOLEAN      NOT NULL DEFAULT TRUE,
-    fecha_creacion DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    fecha_modificacion DATETIME ON UPDATE CURRENT_TIMESTAMP,
+    activo         BOOLEAN      NOT NULL DEFAULT TRUE,    
     CONSTRAINT fk_usuario_rol     FOREIGN KEY (id_rol)      REFERENCES roles(id_rol),
     CONSTRAINT fk_usuario_sucursal FOREIGN KEY (id_sucursal) REFERENCES sucursales(id_sucursal)
 );
+
 
 CREATE TABLE productos (
     id_producto    INT AUTO_INCREMENT PRIMARY KEY,
@@ -43,19 +41,18 @@ CREATE TABLE productos (
     precio         DECIMAL(10,2) NOT NULL DEFAULT 0.00,
     categoria      VARCHAR(80),
     imagen         VARCHAR(255),
-    activo         BOOLEAN NOT NULL DEFAULT TRUE,
-    fecha_creacion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+    activo         BOOLEAN NOT NULL DEFAULT TRUE  
 );
 
 CREATE TABLE producto_sucursal (
     id_producto_sucursal INT AUTO_INCREMENT PRIMARY KEY,
     id_producto    INT NOT NULL,
     id_sucursal    INT NOT NULL,
-    disponible     BOOLEAN NOT NULL DEFAULT TRUE,
-    fecha_creacion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    disponible     BOOLEAN NOT NULL DEFAULT TRUE,    
     FOREIGN KEY (id_producto) REFERENCES productos(id_producto),
     FOREIGN KEY (id_sucursal) REFERENCES sucursales(id_sucursal)
 );
+
 
 CREATE TABLE parametros_juego (
     id_parametro   INT AUTO_INCREMENT PRIMARY KEY,
@@ -130,3 +127,25 @@ INSERT INTO roles (nombre, descripcion) VALUES
     ('JUGADOR',      'Trabaja en la sucursal');
 
 SHOW TABLES;
+
+SHOW TABLES;
+
+SELECT * FROM pedidos;
+
+INSERT INTO usuarios (usuario, contraseña, nombre, apellido, email, id_rol, id_sucursal, activo)
+VALUES (
+    'admin1',
+    '1234',
+    'Carlos',
+    'Perez',
+    'admin@pizza.com',
+    1,
+    NULL,     
+    TRUE
+);
+
+INSERT INTO sucursales (nombre, direccion, activa)
+VALUES ('Sucursal 1', 'Zona 1 Xela', TRUE);
+
+INSERT INTO sucursales (nombre, direccion, activa)
+VALUES ('Sucursal 2', 'Rotonda La Marimba', TRUE);

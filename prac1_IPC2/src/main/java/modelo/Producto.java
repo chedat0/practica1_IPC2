@@ -17,6 +17,9 @@ public class Producto {
     private String imagen;
     private boolean activo;
 
+    public Producto (){
+    }
+    
     public Producto(int idProducto, String nombre, String descripcion, double precio, String categoria, String imagen, boolean activo) {
         this.idProducto = idProducto;
         this.nombre = nombre;
@@ -83,5 +86,8 @@ public class Producto {
         this.activo = activo;
     }
     
-    
+    @Override
+    public String toString (){
+        return nombre;
+    }
 }
