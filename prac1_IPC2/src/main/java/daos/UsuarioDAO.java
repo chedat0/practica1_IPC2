@@ -118,6 +118,16 @@ public class UsuarioDAO {
         }
     }
 
+    public boolean cambiarSucursal(int idUsuario, Integer idSucursal) throws SQLException {
+        String sql = "UPDATE usuarios SET id_sucursal = ? WHERE id_usuario = ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            if (idSucursal != null) ps.setInt(1, idSucursal);
+            else                    ps.setNull(1, java.sql.Types.INTEGER);
+            ps.setInt(2, idUsuario);
+            return ps.executeUpdate() > 0;
+        }
+    }
+    
     private Usuario mapear(ResultSet rs) throws SQLException {
         Usuario u = new Usuario();
         u.setIdUsuario(rs.getInt("id_usuario"));

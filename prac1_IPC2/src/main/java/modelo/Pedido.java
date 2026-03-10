@@ -26,6 +26,7 @@ public class Pedido {
     private int puntosObtenidos;
     private List<DetallePedido> detalles;
     private int tiempoRestante;
+    private int tiempoBloqueo;
     
     
     public Pedido(){
@@ -89,6 +90,10 @@ public class Pedido {
     public int getPuntosObtenidos() {
         return puntosObtenidos;
     }
+    
+    public int getTiempoBloqueo(){
+        return tiempoBloqueo;
+    }
 
     public List<DetallePedido> getDetalles() {
         return detalles;
@@ -142,6 +147,17 @@ public class Pedido {
         this.tiempoRestante = tiempoRestante;
     }
     
+    public void setTiempoBloqueo(int tiempoBloqueo){
+        this.tiempoBloqueo = tiempoBloqueo;
+    }
+    
+    public boolean estaBloqueado(){
+        return tiempoBloqueo > 0;
+    }
+    
+    public void disminuirBloqueo(){
+        if (tiempoBloqueo > 0) tiempoBloqueo--;
+    }
     public void disminuirTiempo(){
         if (tiempoRestante > 0) tiempoRestante--;
     }

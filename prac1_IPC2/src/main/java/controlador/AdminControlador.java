@@ -29,7 +29,7 @@ public class AdminControlador {
     }
 
     public boolean crearProducto(String nombre, String descripcion, double precio,
-                                   String categoria, int idSucursal) throws SQLException {
+                                   String categoria, int idSucursal, int stock) throws SQLException {
         if (nombre == null || nombre.trim().isEmpty()) return false;
         Producto p = new Producto();
         p.setNombre(nombre.trim());
@@ -37,6 +37,7 @@ public class AdminControlador {
         p.setPrecio(precio);
         p.setCategoria(categoria);
         p.setActivo(true);
+        p.setStock(stock);
         boolean ok = productoDAO.ingresar(p);
         // Se asocia a la sucursal actual
         if (ok) {
@@ -66,6 +67,10 @@ public class AdminControlador {
 
     public boolean toggleDisponibilidad(int idProducto, int idSucursal, boolean disponible) throws SQLException {
         return psDAO.toggleDisponible(idProducto, idSucursal, disponible);
+    }
+    
+    public boolean decrementarStock(int idProducto, int cantidad) throws SQLException {
+        return productoDAO.decrementarStock(idProducto, cantidad);
     }
 
     // Muestra las estadiscticas de cada sucursal

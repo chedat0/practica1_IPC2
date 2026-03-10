@@ -68,6 +68,8 @@ public class JuegoControlador {
         pedidosActivos.removeIf(p -> p.getEstado().esFinalizado());
         // Verificar pedidos vencidos
         for (Pedido p : new ArrayList<>(pedidosActivos)) {
+            if (p.getEstado().esFinalizado()) continue;
+            p.disminuirBloqueo();
             p.disminuirTiempo();
             if (p.tiempoAgotado()) {
                 cambiarEstado(p, EstadoPedido.NO_ENTREGADO, Origen.SISTEMA);
@@ -96,6 +98,9 @@ public class JuegoControlador {
         if (pedido.getEstado().esFinalizado())
             return "Este pedido ya esta finalizado.";
 
+        if (pedido.estaBloqueado())
+            return "Espera " + pedido.getTiempoBloqueo() + "s para avanzar este pedido.";
+         
         EstadoPedido siguiente = pedido.getEstado().siguiente();
         if (siguiente == null) return "No hay estado siguiente.";
 
@@ -103,6 +108,11 @@ public class JuegoControlador {
         cambiarEstado(pedido, siguiente, Origen.JUGADOR);
 
         if (siguiente == EstadoPedido.LISTA) {
+            
+            for (modelo.DetallePedido det : pedido.getDetalles()){
+                productoDAO.decrementarStock(det.getProducto().getIdProducto(), det.getCantidad());
+            }
+            
             int tiempoUsado = pedido.getTiempoLimiteDeg() - pedido.getTiempoRestante();
             pedido.setTiempoUsado(tiempoUsado);
             int puntos = calcularPuntos(pedido);
@@ -114,6 +124,11 @@ public class JuegoControlador {
             return "Pedido #" + pedido.getNumeroPedido() + " entregado! +" + puntos + " puntos";
         }
 
+        int numProductos = pedido.getDetalles().size();
+        int baseBloqueo = 3 + random.nextInt(6); // 3 a 8 segundos
+        int extraPorProductos = Math.max(0, numProductos - 1) * 2;
+        pedido.setTiempoBloqueo(baseBloqueo + extraPorProductos);
+        
         return "Pedido #" + pedido.getNumeroPedido() + " avanzado a " + siguiente.name();
     }
 
@@ -139,7 +154,9 @@ public class JuegoControlador {
         p.setIdPartida(partida.getIdPartida());
         p.setNumeroPedido(contadorPedidos);
         p.setNivelAlCrear(nivelActual);
-        p.setTiempoLimiteDeg(getTiempoSegunNivel());
+        int tiempoPedido = getTiempoSegunNivel();
+        p.setTiempoLimiteDeg(tiempoPedido);
+        p.setTiempoRestante(tiempoPedido);
         pedidoDAO.ingresar(p);
 
         // Agregar entre 1 y 3 productos aleatorios

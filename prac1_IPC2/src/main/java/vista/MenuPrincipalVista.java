@@ -67,7 +67,6 @@ public class MenuPrincipalVista extends JFrame{
 
         if (Constantes.ROL_JUGADOR.equals(rol)) {
             panelBotones.add(crearBoton("Jugar", new Color(39, 174, 96), e -> abrirJuego()));
-            panelBotones.add(crearBoton("Ver Ranking", new Color(41, 128, 185), e -> abrirRanking()));
             panelBotones.add(crearBoton("Mi Historial", new Color(142, 68, 173), e -> new HistorialPersonalVista()));        
         }
 

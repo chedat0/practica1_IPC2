@@ -27,6 +27,7 @@ public class GestionUsuariosVista extends JFrame{
     private JTable              tabla;
     private DefaultTableModel   modeloTabla;
     private JTextField          txtUsername, txtNombre, txtApellido, txtEmail, txtPassword;   
+    private JComboBox<Rol>      cmbRol;
     private JComboBox<Sucursal> cmbSucursal;
     private List<Usuario>       usuarios;
 
@@ -38,7 +39,7 @@ public class GestionUsuariosVista extends JFrame{
 
     private void initComponents() {
         setTitle("Gestion de Usuarios");
-        setSize(860, 540);
+        setSize(920, 560);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
 
@@ -58,7 +59,7 @@ public class GestionUsuariosVista extends JFrame{
         JPanel formPanel = new JPanel(new GridBagLayout());
         formPanel.setBackground(new Color(52, 73, 94));
         formPanel.setBorder(BorderFactory.createTitledBorder(
-            BorderFactory.createLineBorder(Color.GRAY), "Registrar Administrador de Tienda",
+            BorderFactory.createLineBorder(Color.GRAY), "Registrar Usuario",
             0, 0, new Font("Arial", Font.BOLD, 12), Color.WHITE));
 
         GridBagConstraints gbc = new GridBagConstraints();
@@ -69,7 +70,8 @@ public class GestionUsuariosVista extends JFrame{
         txtPassword  = new JTextField(16);
         txtNombre    = new JTextField(16);
         txtApellido  = new JTextField(16);
-        txtEmail     = new JTextField(16);        
+        txtEmail     = new JTextField(16); 
+        cmbRol       = new JComboBox<>();
         cmbSucursal  = new JComboBox<>();
 
         agregarCampo(formPanel, gbc, "Usuario:",  txtUsername, 0);
@@ -79,6 +81,11 @@ public class GestionUsuariosVista extends JFrame{
         agregarCampo(formPanel, gbc, "Email:",     txtEmail,    4);
         
 
+        gbc.gridx = 0; gbc.gridy = 5; gbc.gridwidth = 1;
+        JLabel lRol = new JLabel("Rol:"); lRol.setForeground(Color.WHITE);
+        formPanel.add(lRol, gbc);
+        gbc.gridx = 1; formPanel.add(cmbRol, gbc);
+        
         gbc.gridx = 0; gbc.gridy = 6;
         JLabel lSuc = new JLabel("Sucursal:"); lSuc.setForeground(Color.WHITE);
         formPanel.add(lSuc, gbc);
@@ -87,6 +94,7 @@ public class GestionUsuariosVista extends JFrame{
         JPanel btns = new JPanel(new FlowLayout(FlowLayout.CENTER, 8, 4));
         btns.setOpaque(false);
         btns.add(crearBoton("Registrar",   new Color(39, 174, 96),  e -> registrar()));
+        btns.add(crearBoton("Cambiar Sucursal",new Color(41,128,185), e -> cambiarSucursal()));
         btns.add(crearBoton("Desactivar",  new Color(192, 57, 43),  e -> desactivar()));
 
         gbc.gridx = 0; gbc.gridy = 7; gbc.gridwidth = 2;
@@ -108,7 +116,15 @@ public class GestionUsuariosVista extends JFrame{
                     u.getSucursal() != null ? u.getSucursal().getNombre() : "Global",
                     u.isActivo() ? "Si" : "No"
                 });
-            }                        
+            }          
+            
+            cmbRol.removeAllItems();
+            for (Rol r : controller.obtenerRoles()) {
+                if (!Constantes.ROL_SUPER_ADMIN.equals(r.getNombre())) {
+                    cmbRol.addItem(r);
+                }
+            }
+            
             cmbSucursal.removeAllItems();
             cmbSucursal.addItem(null);
             for (Sucursal s : controller.obtenerSucursales()) cmbSucursal.addItem(s);
@@ -120,7 +136,11 @@ public class GestionUsuariosVista extends JFrame{
 
     private void registrar() {
         try {
-            Rol rolAdmin = new RolDAO().encontrarPorNombre(Constantes.ROL_ADMIN_TIENDA);
+            Rol rolSeleccionado = (Rol) cmbRol.getSelectedItem();
+            if (rolSeleccionado == null) {
+                JOptionPane.showMessageDialog(this, "Selecciona un rol.");
+                return;
+            }
             Sucursal sucursal = (Sucursal) cmbSucursal.getSelectedItem();            
 
             controller.registrarUsuario(
@@ -129,15 +149,60 @@ public class GestionUsuariosVista extends JFrame{
                 txtNombre.getText().trim(),
                 txtApellido.getText().trim(),
                 txtEmail.getText().trim(),
-                rolAdmin.getIdRol(),
+                rolSeleccionado.getIdRol(),
                 sucursal != null ? sucursal.getIdSucursal() : null
             );
             JOptionPane.showMessageDialog(this, "Usuario registrado correctamente.");
+            limpiar();
             cargarDatos();
         } catch (IllegalArgumentException e) {
             JOptionPane.showMessageDialog(this, e.getMessage());
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
+        }
+    }
+    
+    private void cambiarSucursal() {
+        int f = tabla.getSelectedRow();
+        if (f < 0) {
+            JOptionPane.showMessageDialog(this, "Selecciona un usuario de la tabla primero.");
+            return;
+        }
+        Usuario u = usuarios.get(f);
+
+        // Construir opciones de sucursal
+        List<Sucursal> sucursales;
+        try {
+            sucursales = controller.obtenerSucursales();
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(this, "Error cargando sucursales: " + ex.getMessage());
+            return;
+        }
+
+        Object[] opciones = new Object[sucursales.size() + 1];
+        opciones[0] = "-- Sin Sucursal (Global) --";
+        for (int i = 0; i < sucursales.size(); i++) opciones[i + 1] = sucursales.get(i);
+
+        Object seleccion = JOptionPane.showInputDialog(
+            this,
+            "Selecciona la nueva sucursal para: " + u.getNombreCompleto(),
+            "Cambiar Sucursal",
+            JOptionPane.QUESTION_MESSAGE,
+            null,
+            opciones,
+            opciones[0]
+        );
+
+        if (seleccion == null) return; // canceló
+
+        try {
+            Integer idNuevaSucursal = (seleccion instanceof Sucursal)
+                ? ((Sucursal) seleccion).getIdSucursal() : null;
+            controller.cambiarSucursalUsuario(u.getIdUsuario(), idNuevaSucursal);
+            JOptionPane.showMessageDialog(this, "Sucursal actualizada correctamente.");
+            cargarDatos();
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage());
         }
     }
 
@@ -155,6 +220,12 @@ public class GestionUsuariosVista extends JFrame{
         }
     }
 
+    private void limpiar() {
+        txtUsername.setText(""); txtPassword.setText("");
+        txtNombre.setText(""); txtApellido.setText(""); txtEmail.setText("");
+        tabla.clearSelection();
+    }
+    
     private void agregarCampo(JPanel p, GridBagConstraints gbc, String lbl, JTextField txt, int row) {
         gbc.gridx = 0; gbc.gridy = row; gbc.gridwidth = 1;
         JLabel l = new JLabel(lbl); l.setForeground(Color.WHITE); p.add(l, gbc);

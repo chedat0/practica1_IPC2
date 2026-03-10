@@ -69,6 +69,10 @@ public class SuperAdminControlador {
         return usuarioDAO.eliminar(id);
     }
 
+    public boolean cambiarSucursalUsuario(int idUsuario, Integer idSucursal) throws SQLException {
+        return usuarioDAO.cambiarSucursal(idUsuario, idSucursal);
+    }
+    
     //Obtener y cambiar los parametros del juego en global
     public List<ParametroJuego> obtenerParametros() throws SQLException {
         return parametroDAO.obtenerTodos();

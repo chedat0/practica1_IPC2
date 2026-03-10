@@ -44,11 +44,11 @@ public class SucursalDAO {
     }
     
     public boolean ingresar(Sucursal s) throws SQLException {
-        String sql = "INSERT INTO sucursales (nombre, direccion, activa) VALUES (?,?,?,?)";
+        String sql = "INSERT INTO sucursales (nombre, direccion, activa) VALUES (?,?,?)";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, s.getNombre());
             ps.setString(2, s.getDirección());            
-            ps.setBoolean(4, s.isActiva());
+            ps.setBoolean(3, s.isActiva());
             return ps.executeUpdate() > 0;
         }
     }
@@ -58,8 +58,8 @@ public class SucursalDAO {
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, s.getNombre());
             ps.setString(2, s.getDirección());
-            ps.setBoolean(4, s.isActiva());
-            ps.setInt(5, s.getIdSucursal());
+            ps.setBoolean(3, s.isActiva());
+            ps.setInt(4, s.getIdSucursal());
             return ps.executeUpdate() > 0;
         }
     }

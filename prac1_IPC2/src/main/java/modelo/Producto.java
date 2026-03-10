@@ -16,11 +16,12 @@ public class Producto {
     private String categoria;
     private String imagen;
     private boolean activo;
+    private int stock;
 
     public Producto (){
     }
     
-    public Producto(int idProducto, String nombre, String descripcion, double precio, String categoria, String imagen, boolean activo) {
+    public Producto(int idProducto, String nombre, String descripcion, double precio, String categoria, String imagen, boolean activo, int stock) {
         this.idProducto = idProducto;
         this.nombre = nombre;
         this.descripcion = descripcion;
@@ -28,6 +29,7 @@ public class Producto {
         this.categoria = categoria;
         this.imagen = imagen;
         this.activo = activo;
+        this.stock = stock;
     }
 
     public int getIdProducto() {
@@ -53,9 +55,13 @@ public class Producto {
     public String getImagen() {
         return imagen;
     }
-
+    
     public boolean isActivo() {
         return activo;
+    }
+    
+     public int getStock(){
+        return stock;
     }
 
     public void setIdProducto(int idProducto) {
@@ -84,6 +90,10 @@ public class Producto {
 
     public void setActivo(boolean activo) {
         this.activo = activo;
+    }
+    
+    public void setStock (int stock) {
+        this.stock = stock;
     }
     
     @Override

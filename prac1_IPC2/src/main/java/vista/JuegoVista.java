@@ -78,7 +78,7 @@ public class JuegoVista extends JFrame{
         // Boton finzalizar partida
         JButton btnRendirse = new JButton("Finalizar Partida");
         btnRendirse.setBackground(new Color(192, 57, 43));
-        btnRendirse.setForeground(Color.WHITE);
+        btnRendirse.setForeground(Color.BLACK);
         btnRendirse.setFont(new Font("Arial", Font.BOLD, 13));
         btnRendirse.setFocusPainted(false);
         btnRendirse.addActionListener(e -> confirmarFinalizacion());
@@ -209,7 +209,11 @@ public class JuegoVista extends JFrame{
             panelBtns.setOpaque(false);
             panelBtns.setPreferredSize(new Dimension(180, 70));
             
-            JButton btnAvanzar = new JButton("Avanzar");
+            
+            boolean bloqueado = pedido.estaBloqueado();
+            String textoAvanzar = bloqueado ? "Avanzar (" + pedido.getTiempoBloqueo() + "s)" : "Avanzar";
+            
+            JButton btnAvanzar = new JButton(textoAvanzar);
             btnAvanzar.setBackground(new Color(39, 174, 96));
             btnAvanzar.setForeground(Color.BLACK);
             btnAvanzar.setFocusPainted(false);

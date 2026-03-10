@@ -22,10 +22,15 @@ public class GestionProductosVista extends JFrame{
     private final AdminControlador controller = new AdminControlador();
     private JTable            tabla;
     private DefaultTableModel modeloTabla;
-    private JTextField        txtNombre, txtDescripcion, txtPrecio, txtCategoria;
+    private JTextField        txtNombre, txtDescripcion, txtPrecio, txtCategoria, txtStock;
     private List<Producto>    productos;
+    private final int         idSucursal;
 
     public GestionProductosVista() {
+        int suc = 0;
+        if (LoginControlador.getSesionActual().getSucursal() != null)
+            suc = LoginControlador.getSesionActual().getSucursal().getIdSucursal();
+        this.idSucursal = suc;
         initComponents();
         cargarProductos();
         setVisible(true);
@@ -33,7 +38,7 @@ public class GestionProductosVista extends JFrame{
 
     private void initComponents() {
         setTitle("Gestion de Productos");
-        setSize(800, 560);
+        setSize(850, 580);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
 
@@ -41,7 +46,7 @@ public class GestionProductosVista extends JFrame{
         panel.setBackground(new Color(44, 62, 80));
         panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         
-        String[] cols = {"ID", "Nombre", "Descripcion", "Precio", "Categoria", "Activo"};
+        String[] cols = {"ID", "Nombre", "Descripcion", "Precio", "Categoria", "Stock","Activo"};
         modeloTabla = new DefaultTableModel(cols, 0) {
             @Override public boolean isCellEditable(int r, int c) { return false; }
         };
@@ -66,19 +71,21 @@ public class GestionProductosVista extends JFrame{
         txtDescripcion = new JTextField(18);
         txtPrecio      = new JTextField(18);
         txtCategoria   = new JTextField(18);
+        txtStock       = new JTextField(18);
 
         int row = 0;
         agregarCampo(panelForm, gbc, "Nombre:",      txtNombre,      row++);
         agregarCampo(panelForm, gbc, "Descripcion:",  txtDescripcion, row++);
         agregarCampo(panelForm, gbc, "Precio:",       txtPrecio,      row++);
         agregarCampo(panelForm, gbc, "Categoria:",    txtCategoria,   row++);
-
+        agregarCampo(panelForm, gbc, "Stock:",        txtStock, row++);
+        
         // Botones
         JPanel panelBtns = new JPanel(new FlowLayout(FlowLayout.CENTER, 8, 4));
         panelBtns.setOpaque(false);
         panelBtns.add(crearBoton("Nuevo",      new Color(39, 174, 96),   e -> limpiarForm()));
         panelBtns.add(crearBoton("Guardar",    new Color(41, 128, 185),  e -> guardar()));
-        panelBtns.add(crearBoton("Desactivar", new Color(192, 57, 43),   e -> desactivar()));
+        panelBtns.add(crearBoton("Activar/Desactivar", new Color(192, 57, 43),   e -> toggleActivo()));
 
         gbc.gridx = 0; gbc.gridy = row; gbc.gridwidth = 2;
         panelForm.add(panelBtns, gbc);
@@ -92,7 +99,7 @@ public class GestionProductosVista extends JFrame{
             int idSucursal = LoginControlador.getSesionActual().getSucursal() != null
                 ? LoginControlador.getSesionActual().getSucursal().getIdSucursal() : 0;
             if (idSucursal > 0)
-                productos = controller.obtenerTodosProductos();
+                productos = controller.obtenerProductosSucursal(idSucursal);
             else
                 productos = controller.obtenerTodosProductos();
 
@@ -101,6 +108,7 @@ public class GestionProductosVista extends JFrame{
                 modeloTabla.addRow(new Object[]{
                     p.getIdProducto(), p.getNombre(), p.getDescripcion(),
                     String.format("Q%.2f", p.getPrecio()), p.getCategoria(),
+                    p.getStock(),
                     p.isActivo() ? "Si" : "No"
                 });
             }
@@ -117,45 +125,56 @@ public class GestionProductosVista extends JFrame{
         txtDescripcion.setText(p.getDescripcion());
         txtPrecio.setText(String.valueOf(p.getPrecio()));
         txtCategoria.setText(p.getCategoria());
+        txtStock.setText(String.valueOf(p.getStock()));
     }
 
     private void guardar() {
         try {
             int fila = tabla.getSelectedRow();
             double precio = Double.parseDouble(txtPrecio.getText().trim());
+            int stock = Integer.parseInt(txtStock.getText().trim());
+            if (stock < 0) {JOptionPane.showMessageDialog(this, "El stock no puede ser negativo"); return; }
             if (fila >= 0 && fila < productos.size()) {
                 Producto p = productos.get(fila);
                 p.setNombre(txtNombre.getText().trim());
                 p.setDescripcion(txtDescripcion.getText().trim());
                 p.setPrecio(precio);
                 p.setCategoria(txtCategoria.getText().trim());
+                p.setStock(stock);
                 controller.actualizarProducto(p);
                 JOptionPane.showMessageDialog(this, "Producto actualizado.");
             } else {
-                int idSucursal = LoginControlador.getSesionActual().getSucursal() != null
-                    ? LoginControlador.getSesionActual().getSucursal().getIdSucursal() : 1;
-                controller.crearProducto(txtNombre.getText().trim(),
-                    txtDescripcion.getText().trim(), precio,
-                    txtCategoria.getText().trim(), idSucursal);
+                controller.crearProducto(
+                    txtNombre.getText().trim(),
+                    txtDescripcion.getText().trim(),
+                    precio,
+                    txtCategoria.getText().trim(),
+                    idSucursal > 0 ? idSucursal : 1,
+                    stock
+                );
                 JOptionPane.showMessageDialog(this, "Producto creado.");
             }
             cargarProductos();
             limpiarForm();
         } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "El precio debe ser un numero valido.");
+            JOptionPane.showMessageDialog(this, "El precio y stock debe ser un numero valido.");
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
         }
     }
 
-    private void desactivar() {
+    private void toggleActivo() {
         int fila = tabla.getSelectedRow();
         if (fila < 0) { JOptionPane.showMessageDialog(this, "Selecciona un producto."); return; }
-        int op = JOptionPane.showConfirmDialog(this, "Desactivar este producto?", "Confirmar",
-            JOptionPane.YES_NO_OPTION);
+        Producto p = productos.get(fila);
+        String accion = p.isActivo() ? "desactivar" : "activar";
+        int op = JOptionPane.showConfirmDialog(this,
+            "¿Deseas " + accion + " el producto: " + p.getNombre() + "?",
+            "Confirmar", JOptionPane.YES_NO_OPTION);
         if (op == JOptionPane.YES_OPTION) {
             try {
-                controller.desactivarProducto(productos.get(fila).getIdProducto());
+                p.setActivo(!p.isActivo());
+                controller.actualizarProducto(p);
                 cargarProductos();
                 limpiarForm();
             } catch (SQLException e) {
@@ -170,6 +189,7 @@ public class GestionProductosVista extends JFrame{
         txtDescripcion.setText("");
         txtPrecio.setText("");
         txtCategoria.setText("");
+        txtStock.setText("");
     }
 
     private void agregarCampo(JPanel p, GridBagConstraints gbc,
@@ -184,11 +204,11 @@ public class GestionProductosVista extends JFrame{
 
     private void estilizarTabla(JTable t) {
         t.setBackground(new Color(52, 73, 94));
-        t.setForeground(Color.WHITE);
+        t.setForeground(Color.BLACK);
         t.setGridColor(new Color(44, 62, 80));
         t.setRowHeight(24);
         t.getTableHeader().setBackground(new Color(41, 128, 185));
-        t.getTableHeader().setForeground(Color.WHITE);
+        t.getTableHeader().setForeground(Color.BLACK);
         t.getTableHeader().setFont(new Font("Arial", Font.BOLD, 12));
         t.setSelectionBackground(new Color(41, 128, 185));
     }
