@@ -34,7 +34,7 @@ public class ParametrosJuegoVista extends JFrame {
 
     private void initComponents() {
         setTitle("Parametros del Juego");
-        setSize(700, 460);
+        setSize(900, 580);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
 

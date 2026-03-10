@@ -14,10 +14,9 @@ CREATE TABLE sucursales (
     id_sucursal    INT AUTO_INCREMENT PRIMARY KEY,
     nombre         VARCHAR(100) NOT NULL,
     direccion      VARCHAR(250),
-    telefono       VARCHAR(10),
     activa         BOOLEAN      NOT NULL DEFAULT TRUE   
 );
-
+ALTER TABLE sucursales DROP COLUMN telefono;
 
 CREATE TABLE usuarios (
     id_usuario     INT AUTO_INCREMENT PRIMARY KEY,
@@ -48,7 +47,7 @@ CREATE TABLE producto_sucursal (
     id_producto_sucursal INT AUTO_INCREMENT PRIMARY KEY,
     id_producto    INT NOT NULL,
     id_sucursal    INT NOT NULL,
-    disponible     BOOLEAN NOT NULL DEFAULT TRUE,    
+    disponible     BOOLEAN NOT NULL DEFAULT TRUE,   
     FOREIGN KEY (id_producto) REFERENCES productos(id_producto),
     FOREIGN KEY (id_sucursal) REFERENCES sucursales(id_sucursal)
 );
@@ -149,3 +148,30 @@ VALUES ('Sucursal 1', 'Zona 1 Xela', TRUE);
 
 INSERT INTO sucursales (nombre, direccion, activa)
 VALUES ('Sucursal 2', 'Rotonda La Marimba', TRUE);
+
+INSERT INTO productos (nombre, descripcion, precio, categoria, activo) VALUES
+    ('Coca Cola', 'Refresco 350ml', 15.00, 'Bebida', TRUE),
+    ('Agua Pura', 'Agua pura 500ml', 10.00, 'Bebida', TRUE);
+    
+INSERT INTO producto_sucursal (id_producto, id_sucursal, disponible)
+SELECT id_producto, 2, TRUE FROM productos WHERE activo = TRUE;
+    
+describe usuarios;
+Select * From usuarios;
+
+INSERT INTO parametros_juego (clave, valor, descripcion) VALUES
+    ('TIEMPO_NIVEL_1',       '60',  'Segundos por pedido en nivel 1'),
+    ('TIEMPO_NIVEL_2',       '50',  'Segundos por pedido en nivel 2'),
+    ('TIEMPO_NIVEL_3',       '40',  'Segundos por pedido en nivel 3'),
+    ('MAX_PEDIDOS_ACTIVOS',  '5',   'Máximo de pedidos simultáneos'),
+    ('DURACION_TURNO',       '300', 'Duración total de la partida en segundos'),
+    ('PUNTOS_PEDIDO_OK',     '100', 'Puntos por pedido completado correctamente'),
+    ('PUNTOS_BONUS_EFIC',    '50',  'Puntos adicionales por eficiencia (menos del 50% del tiempo)'),
+    ('PUNTOS_CANCELADO',     '-30', 'Penalización por pedido cancelado'),
+    ('PUNTOS_NO_ENTREGADO',  '-50', 'Penalización por pedido no entregado a tiempo'),
+    ('PEDIDOS_NIVEL_2',      '5',   'Pedidos correctos para subir a nivel 2'),
+    ('PEDIDOS_NIVEL_3',      '10',  'Pedidos correctos para subir a nivel 3'),
+    ('INTERVALO_GENERACION', '15',  'Segundos entre generación automática de pedidos');
+    
+
+ALTER TABLE producto_sucursal ADD COLUMN stock INT NOT NULL DEFAULT 0;

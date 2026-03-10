@@ -13,15 +13,17 @@ public class ProductoSucursal {
     private Producto producto;
     private Sucursal sucursal;
     private boolean disponible;
+    private int stock;
     
     public ProductoSucursal (){        
     }
 
-    public ProductoSucursal(int idProductoSucursal, Producto producto, Sucursal sucursal, boolean disponible) {
+    public ProductoSucursal(int idProductoSucursal, Producto producto, Sucursal sucursal, boolean disponible, int stock) {
         this.idProductoSucursal = idProductoSucursal;
         this.producto = producto;
         this.sucursal = sucursal;
         this.disponible = disponible;
+        this.stock = stock;
     }
 
     public int getIdProductoSucursal() {
@@ -34,6 +36,10 @@ public class ProductoSucursal {
 
     public Sucursal getSucursal() {
         return sucursal;
+    }
+    
+    public int getStock(){
+        return stock;
     }
 
     public boolean isDisponible() {
@@ -56,5 +62,8 @@ public class ProductoSucursal {
         this.disponible = disponible;
     }
     
-    
+    public void setStock (int stock){
+        this.stock = stock;
+    }
+     
 }

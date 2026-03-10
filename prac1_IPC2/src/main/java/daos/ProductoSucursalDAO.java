@@ -59,20 +59,22 @@ public class ProductoSucursalDAO {
     }
    
     public boolean ingresar(ProductoSucursal ps2) throws SQLException {
-        String sql = "INSERT INTO producto_sucursal (id_producto, id_sucursal, disponible) VALUES (?,?,?)";
+        String sql = "INSERT INTO producto_sucursal (id_producto, id_sucursal, disponible, stock) VALUES (?,?,?)";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, ps2.getProducto().getIdProducto());
             ps.setInt(2, ps2.getSucursal().getIdSucursal());
             ps.setBoolean(3, ps2.isDisponible());
+            ps.setInt(4, ps2.getStock());
             return ps.executeUpdate() > 0;
         }
     }
     
     public boolean actualizar(ProductoSucursal ps2) throws SQLException {
-        String sql = "UPDATE producto_sucursal SET disponible=? WHERE id_producto_sucursal=?";
+        String sql = "UPDATE producto_sucursal SET disponible=?, stock=? WHERE id_producto_sucursal=?";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setBoolean(1, ps2.isDisponible());
-            ps.setInt(2, ps2.getIdProductoSucursal());
+            ps.setInt(2, ps2.getStock());
+            ps.setInt(3, ps2.getIdProductoSucursal());
             return ps.executeUpdate() > 0;
         }
     }
@@ -95,12 +97,23 @@ public class ProductoSucursalDAO {
         }
     }
 
+    public boolean decrementarStock(int idProducto, int idSucursal, int cantidad) throws SQLException {
+        String sql = "UPDATE producto_sucursal SET stock = GREATEST(0, stock - ?) WHERE id_producto = ? AND id_sucursal = ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, cantidad);
+            ps.setInt(2, idProducto);
+            ps.setInt(3, idSucursal);
+            return ps.executeUpdate() > 0;
+        }
+    }
+    
     private ProductoSucursal mapear(ResultSet rs) throws SQLException {
         ProductoSucursal ps2 = new ProductoSucursal();
         ps2.setIdProductoSucursal(rs.getInt("id_producto_sucursal"));
         ps2.setProducto(productoDAO.obtenerPorID(rs.getInt("id_producto")));
         ps2.setSucursal(sucursalDAO.obtenerSucursal(rs.getInt("id_sucursal")));
         ps2.setDisponible(rs.getBoolean("disponible"));
+        ps2.setStock(rs.getInt("stock"));
         return ps2;
     }
 }

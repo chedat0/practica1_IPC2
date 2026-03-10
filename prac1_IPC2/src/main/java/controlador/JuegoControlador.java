@@ -24,6 +24,7 @@ public class JuegoControlador {
     private final NivelPartidaDAO        nivelDAO      = new NivelPartidaDAO();
     private final ParametroJuegoDAO      paramDAO      = new ParametroJuegoDAO();
     private final ProductoDAO            productoDAO   = new ProductoDAO();
+    private final ProductoSucursalDAO    psDao         = new ProductoSucursalDAO();
 
     private Partida        partida;
     private List<Pedido>   pedidosActivos;
@@ -40,6 +41,9 @@ public class JuegoControlador {
     private int puntosOk, puntosBonus, puntosCancelado, puntosNoEntregado;
     private int pedidosNivel2, pedidosNivel3;
     private int intervaloGeneracion;
+    
+    private int maxPedidosActivosActual;
+    private int intervaloActual;
 
     public void iniciarPartida(Usuario jugador) throws SQLException {
         cargarParametros();
@@ -54,6 +58,9 @@ public class JuegoControlador {
         partida.setSucursal(jugador.getSucursal());
         partidaDAO.ingresar(partida);
 
+        maxPedidosActivosActual = maxPedidosActivos;
+        intervaloActual = intervaloGeneracion;
+        
         // Registrar nivel 1
         registrarNivel(1);
     }
@@ -81,8 +88,8 @@ public class JuegoControlador {
         
 
         // Generar nuevo pedido si corresponde
-        if (segundosSinGenerar >= intervaloGeneracion &&
-            pedidosActivos.size() < maxPedidosActivos &&
+        if (segundosSinGenerar >= intervaloActual &&
+            pedidosActivos.size() < maxPedidosActivosActual &&
             turnoRestante > 0) {
             generarPedidoAleatorio();
             segundosSinGenerar = 0;
@@ -110,7 +117,7 @@ public class JuegoControlador {
         if (siguiente == EstadoPedido.LISTA) {
             
             for (modelo.DetallePedido det : pedido.getDetalles()){
-                productoDAO.decrementarStock(det.getProducto().getIdProducto(), det.getCantidad());
+                psDao.decrementarStock(det.getProducto().getIdProducto(), partida.getSucursal().getIdSucursal(), det.getCantidad());
             }
             
             int tiempoUsado = pedido.getTiempoLimiteDeg() - pedido.getTiempoRestante();
@@ -125,7 +132,7 @@ public class JuegoControlador {
         }
 
         int numProductos = pedido.getDetalles().size();
-        int baseBloqueo = 3 + random.nextInt(6); // 3 a 8 segundos
+        int baseBloqueo = 4 + random.nextInt(9); // 4 a 12 segundos
         int extraPorProductos = Math.max(0, numProductos - 1) * 2;
         pedido.setTiempoBloqueo(baseBloqueo + extraPorProductos);
         
@@ -146,7 +153,8 @@ public class JuegoControlador {
 
     private void generarPedidoAleatorio() throws SQLException {
         List<Producto> disponibles = productoDAO.obtenerDisponiblesPorSucursal(
-            partida.getSucursal().getIdSucursal());
+            partida.getSucursal().getIdSucursal());                
+        
         if (disponibles.isEmpty()) return;
 
         contadorPedidos++;
@@ -159,8 +167,8 @@ public class JuegoControlador {
         p.setTiempoRestante(tiempoPedido);
         pedidoDAO.ingresar(p);
 
-        // Agregar entre 1 y 3 productos aleatorios
-        int cantProductos = 1 + random.nextInt(Math.min(3, disponibles.size()));
+        // Agregar entre 1 y la  cantidad de productos existentes con stock y activos aleatorios
+        int cantProductos = 1 + random.nextInt(disponibles.size());
         List<Producto> seleccionados = new ArrayList<>();
         for (int i = 0; i < cantProductos; i++) {
             Producto prod = disponibles.get(random.nextInt(disponibles.size()));
@@ -193,6 +201,8 @@ public class JuegoControlador {
         if (nuevoNivel > nivelActual) {
             nivelActual = nuevoNivel;
             partida.setNivelMaximo(nuevoNivel);
+            maxPedidosActivosActual = maxPedidosActivos + (nuevoNivel -1);
+            intervaloActual = Math.max(8, intervaloGeneracion - (nuevoNivel == 2 ? 4 : 8));
             registrarNivel(nuevoNivel);
         }
     }

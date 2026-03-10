@@ -29,7 +29,7 @@ public class LoginVista extends JFrame{
 
     private void initComponents() {
         setTitle("Pizza Express Tycoon - Login");
-        setSize(420, 390);
+        setSize(550, 450);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setResizable(false);

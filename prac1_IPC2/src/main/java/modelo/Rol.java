@@ -55,4 +55,11 @@ public class Rol {
         this.activo = activo;
     }
 
+    @Override
+    public String toString() {
+        return nombre;
+    }
+    
+    
+
 }

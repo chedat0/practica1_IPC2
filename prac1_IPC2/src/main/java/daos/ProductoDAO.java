@@ -68,30 +68,34 @@ public class ProductoDAO {
     }
     
     public boolean ingresar(Producto p) throws SQLException {
-        String sql = "INSERT INTO productos (nombre, descripcion, precio, categoria, imagen, activo, stock) VALUES (?,?,?,?,?,?,?)";
+        String sql = "INSERT INTO productos (nombre, descripcion, precio, categoria, imagen, activo) VALUES (?,?,?,?,?,?,?)";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, p.getNombre());
             ps.setString(2, p.getDescripcion());
             ps.setDouble(3, p.getPrecio());
             ps.setString(4, p.getCategoria());
             ps.setString(5, p.getImagen());
-            ps.setBoolean(6, p.isActivo());
-            ps.setInt(7, p.getStock());
-            return ps.executeUpdate() > 0;
+            ps.setBoolean(6, p.isActivo());            
+            int rows = ps.executeUpdate();
+            if (rows > 0) {
+                ResultSet keys = ps.getGeneratedKeys();
+                if (keys.next()) {
+                    p.setIdProducto(keys.getInt(1)); // ← asignar ID
+                }
+            }
+            return rows > 0;
         }
     }
     
     public boolean actualizar(Producto p) throws SQLException {
-        String sql = "UPDATE productos SET nombre=?, descripcion=?, precio=?, categoria=?, imagen=?, activo=?, stock=? WHERE id_producto=?";
+        String sql = "UPDATE productos SET nombre=?, descripcion=?, precio=?, categoria=?, activo=? WHERE id_producto=?";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, p.getNombre());
             ps.setString(2, p.getDescripcion());
             ps.setDouble(3, p.getPrecio());
-            ps.setString(4, p.getCategoria());
-            ps.setString(5, p.getImagen());
-            ps.setBoolean(6, p.isActivo());
-            ps.setInt(7, p.getStock());
-            ps.setInt(7, p.getIdProducto());
+            ps.setString(4, p.getCategoria());           
+            ps.setBoolean(5, p.isActivo());            
+            ps.setInt(6, p.getIdProducto());
             return ps.executeUpdate() > 0;
         }
     }
@@ -103,16 +107,7 @@ public class ProductoDAO {
             return ps.executeUpdate() > 0;
         }
     }
-    
-    public boolean decrementarStock(int idProducto, int cantidad) throws SQLException {
-        String sql = "UPDATE productos SET stock = GREATEST(0, stock - ?) WHERE id_producto = ?";
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, cantidad);
-            ps.setInt(2, idProducto);
-            return ps.executeUpdate() > 0;
-        }
-    }
-
+       
     private Producto mapear(ResultSet rs) throws SQLException {
         return new Producto(
             rs.getInt("id_producto"),
@@ -121,8 +116,7 @@ public class ProductoDAO {
             rs.getDouble("precio"),
             rs.getString("categoria"),
             rs.getString("imagen"),
-            rs.getBoolean("activo"),
-            rs.getInt("stock")
+            rs.getBoolean("activo")         
         );
     }
 }

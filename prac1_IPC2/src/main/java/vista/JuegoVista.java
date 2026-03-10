@@ -53,7 +53,7 @@ public class JuegoVista extends JFrame{
         panelHUD.setBackground(new Color(52, 73, 94));
         panelHUD.setBorder(BorderFactory.createLineBorder(new Color(231, 76, 60), 2));
 
-        lblTurno  = crearLabelHUD("Tiempo: 300s", new Color(231, 76, 60));
+        lblTurno  = crearLabelHUD("Tiempo: s", new Color(231, 76, 60));
         lblPuntaje = crearLabelHUD("Puntaje: 0",  new Color(39, 174, 96));
         lblNivel  = crearLabelHUD("Nivel: 1",     new Color(241, 196, 15));
 
@@ -68,12 +68,22 @@ public class JuegoVista extends JFrame{
         panelPedidos.setBackground(new Color(44, 62, 80));
 
         lblMensaje = new JLabel(" ", SwingConstants.CENTER);
+        lblMensaje.setFont(new Font("Arial", Font.BOLD, 14));
+        lblMensaje.setForeground(new Color(39, 174, 96));
+        lblMensaje.setOpaque(true);
+        lblMensaje.setBackground(new Color(52, 73, 94));
+        lblMensaje.setBorder(BorderFactory.createEmptyBorder(4, 10, 4, 10));
+        
         scrollPedidos = new JScrollPane(panelPedidos);
         scrollPedidos.setBorder(BorderFactory.createTitledBorder(
             BorderFactory.createLineBorder(Color.GRAY), "Pedidos Activos",
             0, 0, new Font("Arial", Font.BOLD, 14), Color.WHITE));
         scrollPedidos.getViewport().setBackground(new Color(44, 62, 80));
-        panelPrincipal.add(scrollPedidos, BorderLayout.CENTER);
+         JPanel panelCentro = new JPanel(new BorderLayout(0, 4));
+        panelCentro.setBackground(new Color(44, 62, 80));
+        panelCentro.add(lblMensaje, BorderLayout.NORTH);
+        panelCentro.add(scrollPedidos, BorderLayout.CENTER);
+        panelPrincipal.add(panelCentro, BorderLayout.CENTER);
 
         // Boton finzalizar partida
         JButton btnRendirse = new JButton("Finalizar Partida");
@@ -207,7 +217,7 @@ public class JuegoVista extends JFrame{
             // Botones derecha
             JPanel panelBtns = new JPanel(new GridLayout(1, 2, 5, 0));
             panelBtns.setOpaque(false);
-            panelBtns.setPreferredSize(new Dimension(180, 70));
+            panelBtns.setPreferredSize(new Dimension(250, 90));
             
             
             boolean bloqueado = pedido.estaBloqueado();

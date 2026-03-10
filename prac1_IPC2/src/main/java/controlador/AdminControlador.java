@@ -31,34 +31,31 @@ public class AdminControlador {
     public boolean crearProducto(String nombre, String descripcion, double precio,
                                    String categoria, int idSucursal, int stock) throws SQLException {
         if (nombre == null || nombre.trim().isEmpty()) return false;
-        Producto p = new Producto();
+        Producto p = new Producto();        
         p.setNombre(nombre.trim());
         p.setDescripcion(descripcion);
         p.setPrecio(precio);
         p.setCategoria(categoria);
-        p.setActivo(true);
-        p.setStock(stock);
+        p.setActivo(true);        
         boolean ok = productoDAO.ingresar(p);
         // Se asocia a la sucursal actual
-        if (ok) {
-            List<Producto> todos = productoDAO.obtenerActivos();
-            Producto nuevo = todos.stream()
-                .filter(x -> x.getNombre().equals(nombre.trim()))
-                .findFirst().orElse(null);
-            if (nuevo != null) {
-                ProductoSucursal ps = new ProductoSucursal();
-                ps.setProducto(nuevo);
-                Sucursal s = new Sucursal(); s.setIdSucursal(idSucursal);
-                ps.setSucursal(s);
-                ps.setDisponible(true);
-                psDAO.ingresar(ps);
-            }
+        if (ok) {            
+            ProductoSucursal ps = new ProductoSucursal();
+            ps.setProducto(p);
+            Sucursal s = new Sucursal();
+            s.setIdSucursal(idSucursal);
+            ps.setSucursal(s);
+            ps.setDisponible(true);
+            psDAO.ingresar(ps);        
         }
         return ok;
     }
 
     public boolean actualizarProducto(Producto p) throws SQLException {
         return productoDAO.actualizar(p);
+    }
+    public boolean actualizarStockSucursal(ProductoSucursal ps) throws SQLException {
+    return psDAO.actualizar(ps);
     }
 
     public boolean desactivarProducto(int id) throws SQLException {
@@ -69,8 +66,8 @@ public class AdminControlador {
         return psDAO.toggleDisponible(idProducto, idSucursal, disponible);
     }
     
-    public boolean decrementarStock(int idProducto, int cantidad) throws SQLException {
-        return productoDAO.decrementarStock(idProducto, cantidad);
+    public boolean decrementarStock(int idProducto, int idSucursal, int cantidad) throws SQLException {
+        return psDAO.decrementarStock(idProducto, idSucursal, cantidad);
     }
 
     // Muestra las estadiscticas de cada sucursal

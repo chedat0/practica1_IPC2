@@ -4,10 +4,15 @@
  */
 package vista;
 
+import daos.PartidaDAO;
 import modelo.Partida;
 
 import javax.swing.*;
 import java.awt.*;
+import java.sql.SQLException;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
 /**
  *
  * @author jeffm
@@ -21,7 +26,7 @@ public class FinPartidaVista extends JFrame {
 
     private void initComponents(Partida partida, JFrame menuParent) {
         setTitle("Fin de Partida");
-        setSize(420, 380);
+        setSize(500, 450);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
         setResizable(false);
@@ -48,6 +53,11 @@ public class FinPartidaVista extends JFrame {
         agregarStat(panelStats, "Pedidos No Entregados:", String.valueOf(partida.getPedidosNoEntregados()));
         panel.add(panelStats, BorderLayout.CENTER);
 
+        String posicionTexto = calcularPosicionRanking(partida);
+        agregarStat(panelStats, "Posicion en Ranking:", posicionTexto);
+
+        panel.add(panelStats, BorderLayout.CENTER);
+        
         // Botones
         JPanel panelBtns = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 0));
         panelBtns.setBackground(new Color(44, 62, 80));
@@ -60,20 +70,47 @@ public class FinPartidaVista extends JFrame {
             dispose();
             menuParent.setVisible(true);
         });
+        
 
-        JButton btnRanking = new JButton("Ver Ranking");
-        btnRanking.setBackground(new Color(142, 68, 173));
-        btnRanking.setForeground(Color.BLACK);
-        btnRanking.setFocusPainted(false);
-        btnRanking.addActionListener(e -> new RankingVista());
-
-        panelBtns.add(btnMenu);
-        panelBtns.add(btnRanking);
+        panelBtns.add(btnMenu);       
         panel.add(panelBtns, BorderLayout.SOUTH);
 
         add(panel);
     }
 
+    private String calcularPosicionRanking(Partida partida) {
+        try {
+            PartidaDAO dao = new PartidaDAO();
+            List<Partida> todasFinalizadas;
+            if (partida.getSucursal() != null) {
+                todasFinalizadas = dao.obtenerFinalizadasPorSucursal(partida.getSucursal().getIdSucursal());
+            } else {
+                todasFinalizadas = dao.obtenerFinalizadas();
+            }
+
+            // Mejor puntaje por jugador
+            List<Integer> mejoresPuntajes = todasFinalizadas.stream()
+                .collect(Collectors.groupingBy(
+                    p -> p.getUsuario() != null ? p.getUsuario().getIdUsuario() : 0,
+                    Collectors.maxBy(Comparator.comparingInt(Partida::getPuntajeTotal))
+                ))
+                .values().stream()
+                .filter(opt -> opt.isPresent())
+                .map(opt -> opt.get().getPuntajeTotal())
+                .sorted(Comparator.reverseOrder())
+                .collect(Collectors.toList());
+
+            int pos = 1;
+            for (int puntaje : mejoresPuntajes) {
+                if (partida.getPuntajeTotal() >= puntaje) break;
+                pos++;
+            }
+            return "#" + pos + " de " + mejoresPuntajes.size();
+        } catch (SQLException e) {
+            return "N/A";
+        }
+    }
+    
     private void agregarStat(JPanel panel, String etiqueta, String valor) {
         JLabel lbl = new JLabel(etiqueta);
         lbl.setFont(new Font("Arial", Font.BOLD, 13));

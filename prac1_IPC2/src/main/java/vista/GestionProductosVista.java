@@ -6,6 +6,7 @@ package vista;
 
 import controlador.AdminControlador;
 import controlador.LoginControlador;
+import daos.ProductoSucursalDAO;
 import modelo.Producto;
 
 import javax.swing.*;
@@ -13,6 +14,7 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.sql.SQLException;
 import java.util.List;
+import modelo.ProductoSucursal;
 
 /**
  *
@@ -23,7 +25,7 @@ public class GestionProductosVista extends JFrame{
     private JTable            tabla;
     private DefaultTableModel modeloTabla;
     private JTextField        txtNombre, txtDescripcion, txtPrecio, txtCategoria, txtStock;
-    private List<Producto>    productos;
+    private List<ProductoSucursal>    psLista;
     private final int         idSucursal;
 
     public GestionProductosVista() {
@@ -38,7 +40,7 @@ public class GestionProductosVista extends JFrame{
 
     private void initComponents() {
         setTitle("Gestion de Productos");
-        setSize(850, 580);
+        setSize(950, 680);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
 
@@ -96,19 +98,16 @@ public class GestionProductosVista extends JFrame{
 
     private void cargarProductos() {
         try {
-            int idSucursal = LoginControlador.getSesionActual().getSucursal() != null
-                ? LoginControlador.getSesionActual().getSucursal().getIdSucursal() : 0;
-            if (idSucursal > 0)
-                productos = controller.obtenerProductosSucursal(idSucursal);
-            else
-                productos = controller.obtenerTodosProductos();
+            ProductoSucursalDAO psDAO = new ProductoSucursalDAO();
+            psLista = psDAO.obtenerPorSucursal(idSucursal);
 
             modeloTabla.setRowCount(0);
-            for (Producto p : productos) {
+            for (ProductoSucursal ps : psLista) {        
+                Producto p = ps.getProducto();
                 modeloTabla.addRow(new Object[]{
                     p.getIdProducto(), p.getNombre(), p.getDescripcion(),
                     String.format("Q%.2f", p.getPrecio()), p.getCategoria(),
-                    p.getStock(),
+                    ps.getStock(),
                     p.isActivo() ? "Si" : "No"
                 });
             }
@@ -119,13 +118,14 @@ public class GestionProductosVista extends JFrame{
 
     private void seleccionarFila() {
         int fila = tabla.getSelectedRow();
-        if (fila < 0 || fila >= productos.size()) return;
-        Producto p = productos.get(fila);
+        if (fila < 0 || fila >= psLista.size()) return;
+        ProductoSucursal ps = psLista.get(fila);
+        Producto p = ps.getProducto();
         txtNombre.setText(p.getNombre());
         txtDescripcion.setText(p.getDescripcion());
         txtPrecio.setText(String.valueOf(p.getPrecio()));
         txtCategoria.setText(p.getCategoria());
-        txtStock.setText(String.valueOf(p.getStock()));
+        txtStock.setText(String.valueOf(ps.getStock()));
     }
 
     private void guardar() {
@@ -134,14 +134,16 @@ public class GestionProductosVista extends JFrame{
             double precio = Double.parseDouble(txtPrecio.getText().trim());
             int stock = Integer.parseInt(txtStock.getText().trim());
             if (stock < 0) {JOptionPane.showMessageDialog(this, "El stock no puede ser negativo"); return; }
-            if (fila >= 0 && fila < productos.size()) {
-                Producto p = productos.get(fila);
+            if (fila >= 0 && fila < psLista.size()) {
+                ProductoSucursal ps = psLista.get(fila);
+                Producto p = ps.getProducto();
                 p.setNombre(txtNombre.getText().trim());
                 p.setDescripcion(txtDescripcion.getText().trim());
                 p.setPrecio(precio);
                 p.setCategoria(txtCategoria.getText().trim());
-                p.setStock(stock);
+                ps.setStock(stock);
                 controller.actualizarProducto(p);
+                controller.actualizarStockSucursal(ps);
                 JOptionPane.showMessageDialog(this, "Producto actualizado.");
             } else {
                 controller.crearProducto(
@@ -165,8 +167,8 @@ public class GestionProductosVista extends JFrame{
 
     private void toggleActivo() {
         int fila = tabla.getSelectedRow();
-        if (fila < 0) { JOptionPane.showMessageDialog(this, "Selecciona un producto."); return; }
-        Producto p = productos.get(fila);
+        if (fila < 0) { JOptionPane.showMessageDialog(this, "Selecciona un producto."); return; }        
+        Producto p = psLista.get(fila).getProducto();
         String accion = p.isActivo() ? "desactivar" : "activar";
         int op = JOptionPane.showConfirmDialog(this,
             "¿Deseas " + accion + " el producto: " + p.getNombre() + "?",

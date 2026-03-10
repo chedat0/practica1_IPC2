@@ -13,15 +13,12 @@ import javax.swing.UIManager;
  */
 public class Prac1_IPC2 {
 
-    public static void main(String[] args) {
-        // Intentar usar el look and feel del sistema operativo
+    public static void main(String[] args) {        
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Exception e) {
-            // Si falla, se usa el look and feel por defecto de Java
-        }
-
-        // Toda GUI de Swing debe iniciarse en el Event Dispatch Thread (EDT)
+        } catch (Exception e) {       
+            System.out.println("Error al iniciar el sistema");
+        }      
         SwingUtilities.invokeLater(() -> new LoginVista());
     }
 }
