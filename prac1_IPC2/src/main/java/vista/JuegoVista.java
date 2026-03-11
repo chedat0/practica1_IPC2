@@ -104,8 +104,18 @@ public class JuegoVista extends JFrame{
     private void iniciarJuego() {
         try {
             controller.iniciarPartida(LoginControlador.getSesionActual());
-        } catch (SQLException e) {
+        } catch (IllegalStateException e) {
+            JOptionPane.showMessageDialog(this,
+                    e.getMessage(),
+                    "Sin stock disponible",
+                    JOptionPane.WARNING_MESSAGE);
+            dispose();
+            menuParent.setVisible(true);
+            return;  
+        }catch (SQLException e) {
             JOptionPane.showMessageDialog(this, "Error al iniciar la partida: " + e.getMessage());
+            dispose();
+            menuParent.setVisible(true);
             return;
         }
 
@@ -153,6 +163,8 @@ public class JuegoVista extends JFrame{
     }
 
     private void confirmarFinalizacion() {
+        if (timerJuego == null) return;
+
         int op = JOptionPane.showConfirmDialog(this,
             "Deseas finalizar la partida ahora?", "Finalizar",
             JOptionPane.YES_NO_OPTION);

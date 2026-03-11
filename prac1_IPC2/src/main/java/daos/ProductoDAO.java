@@ -58,6 +58,7 @@ public class ProductoDAO {
         String sql = "SELECT p.* FROM productos p " +
                      "INNER JOIN producto_sucursal ps ON p.id_producto = ps.id_producto " +
                      "WHERE ps.id_sucursal = ? AND ps.disponible = TRUE AND p.activo = TRUE " +
+                     "AND ps.stock > 0 " +
                      "ORDER BY p.nombre";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, idSucursal);

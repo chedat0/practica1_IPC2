@@ -26,7 +26,8 @@ public class GestionUsuariosVista extends JFrame{
     private final SuperAdminControlador controller = new SuperAdminControlador();
     private JTable              tabla;
     private DefaultTableModel   modeloTabla;
-    private JTextField          txtUsername, txtNombre, txtApellido, txtEmail, txtPassword;   
+    private JTextField          txtUsername, txtNombre, txtApellido, txtEmail;   
+    private JPasswordField      txtPassword;
     private JComboBox<Rol>      cmbRol;
     private JComboBox<Sucursal> cmbSucursal;
     private List<Usuario>       usuarios;
@@ -67,7 +68,7 @@ public class GestionUsuariosVista extends JFrame{
         gbc.fill   = GridBagConstraints.HORIZONTAL;
 
         txtUsername  = new JTextField(16);
-        txtPassword  = new JTextField(16);
+        txtPassword  = new JPasswordField(16);
         txtNombre    = new JTextField(16);
         txtApellido  = new JTextField(16);
         txtEmail     = new JTextField(16); 

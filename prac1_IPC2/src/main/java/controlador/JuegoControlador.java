@@ -47,6 +47,13 @@ public class JuegoControlador {
 
     public void iniciarPartida(Usuario jugador) throws SQLException {
         cargarParametros();
+        List<Producto> disponibles = productoDAO.obtenerDisponiblesPorSucursal(
+                jugador.getSucursal().getIdSucursal());
+        if (disponibles.isEmpty()) {
+            throw new IllegalStateException(
+                    "No hay productos con stock disponible en esta sucursal.\n"
+                    + "El administrador debe reponer el stock antes de jugar.");
+        }
         pedidosActivos    = new ArrayList<>();
         nivelActual       = 1;
         turnoRestante     = duracionTurno;

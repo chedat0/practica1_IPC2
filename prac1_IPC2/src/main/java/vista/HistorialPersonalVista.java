@@ -5,6 +5,7 @@
 package vista;
 
 import controlador.LoginControlador;
+import daos.ParametroJuegoDAO;
 import daos.PartidaDAO;
 import daos.PedidoDAO;
 import modelo.Partida;
@@ -15,6 +16,7 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.sql.SQLException;
 import java.util.List;
+import modelo.Constantes;
 import modelo.Pedido;
 
 /**
@@ -28,6 +30,8 @@ public class HistorialPersonalVista extends JFrame{
     private JLabel lblTotalPartidas, lblMejorPuntaje, lblTotalPuntos;
     private JLabel lblDetallePartida;
     private List<Partida> partidas;
+    private int puntosCancelado;
+    private int puntosNoEntregado;
     
     public HistorialPersonalVista() {
         initComponents();
@@ -129,6 +133,9 @@ public class HistorialPersonalVista extends JFrame{
 
     private void cargarHistorial() {
         try {
+            ParametroJuegoDAO paramDAO = new ParametroJuegoDAO();
+            puntosCancelado = paramDAO.getValorInt(Constantes.PARAM_PUNTOS_CANCELADO, -30);
+            puntosNoEntregado = paramDAO.getValorInt(Constantes.PARAM_PUNTOS_NO_ENTREGADO, -50);
             PartidaDAO dao     = new PartidaDAO();
             int idUsuario      = LoginControlador.getSesionActual().getIdUsuario();
             partidas = dao.obtenerPorUsuario(idUsuario);
@@ -184,7 +191,7 @@ public class HistorialPersonalVista extends JFrame{
                     ped.getResumenProducto(),
                     ped.getEstado().name(),
                     ped.getTiempoUsado() > 0 ? ped.getTiempoUsado() + "s" : "—",
-                    ped.getPuntosObtenidos() != 0 ? ped.getPuntosObtenidos() : "—",
+                    obtenerPuntos(ped),
                     ped.getNivelAlCrear()
                 });
             }
@@ -203,6 +210,19 @@ public class HistorialPersonalVista extends JFrame{
         lbl.setFont(new Font("Arial", Font.BOLD, 13));
         lbl.setForeground(Color.black);
         return lbl;
+    }
+    
+    private String obtenerPuntos(Pedido ped) {
+        switch (ped.getEstado()) {
+            case LISTA:
+                return "+" + ped.getPuntosObtenidos();
+            case CANCELADA:
+                return String.valueOf(puntosCancelado);
+            case NO_ENTREGADO:
+                return String.valueOf(puntosNoEntregado);
+            default:
+                return "—";
+        }
     }
     
     private void estilizarTabla(JTable t) {
